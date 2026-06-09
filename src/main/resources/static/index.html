@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LiNMU - បណ្ណាល័យឌីជីថល</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #1a3a5c;
+    --accent: #c8932a;
+    --accent2: #e8b84b;
+    --light: #f5f0e8;
+    --white: #ffffff;
+    --text: #1a1a2e;
+    --muted: #6b7280;
+    --card-bg: #ffffff;
+    --border: #e5e0d5;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--light);
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  /* TOP BAR */
+  .topbar {
+    background: var(--primary);
+    color: rgba(255,255,255,0.8);
+    font-size: 12px;
+    padding: 6px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .topbar a { color: var(--accent2); text-decoration: none; margin-left: 16px; }
+
+  /* NAVBAR */
+  nav {
+    background: var(--white);
+    box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .logo-section {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 0;
+    text-decoration: none;
+    min-width: 260px;
+  }
+  .logo-icon {
+    width: 52px;
+    height: 52px;
+    background: linear-gradient(135deg, var(--primary), #2a5a8c);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(26,58,92,0.3);
+  }
+  .logo-text { line-height: 1.2; }
+  .logo-text .name {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--primary);
+    display: block;
+  }
+  .logo-text .sub {
+    font-size: 10px;
+    color: var(--muted);
+    display: block;
+    letter-spacing: 0.5px;
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    gap: 0;
+    flex: 1;
+    justify-content: center;
+  }
+  .nav-links > li { position: relative; }
+  .nav-links > li > a {
+    display: block;
+    padding: 20px 16px;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 13.5px;
+    font-weight: 500;
+    transition: color 0.2s;
+    white-space: nowrap;
+  }
+  .nav-links > li > a:hover, .nav-links > li > a.active { color: var(--accent); }
+  .nav-links > li > a.active { border-bottom: 2px solid var(--accent); }
+
+  .dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: var(--white);
+    min-width: 220px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+    border-radius: 8px;
+    padding: 8px 0;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(8px);
+    transition: all 0.2s;
+    z-index: 200;
+  }
+  .nav-links > li:hover .dropdown { opacity: 1; pointer-events: all; transform: translateY(0); }
+  .dropdown a {
+    display: block;
+    padding: 9px 20px;
+    font-size: 13px;
+    color: var(--text);
+    text-decoration: none;
+    transition: background 0.15s;
+  }
+  .dropdown a:hover { background: var(--light); color: var(--accent); }
+
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto;
+  }
+  .btn-login {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 9px 22px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-family: inherit;
+    text-decoration: none;
+  }
+  .btn-login:hover { background: #0f2640; }
+  .lang-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 7px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    background: none;
+    color: var(--text);
+    font-family: inherit;
+    text-decoration: none;
+  }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(135deg, var(--primary) 0%, #0f2a45 60%, #1a4a7a 100%);
+    position: relative;
+    overflow: hidden;
+    padding: 80px 40px;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+  .hero-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.15;
+  }
+  .hero-orb-1 { width: 500px; height: 500px; background: var(--accent); top: -200px; right: -100px; }
+  .hero-orb-2 { width: 300px; height: 300px; background: #4a9eff; bottom: -100px; left: 200px; }
+
+  .hero-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+  }
+  .hero-content { color: white; }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(200,147,42,0.2);
+    border: 1px solid rgba(200,147,42,0.4);
+    color: var(--accent2);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 48px;
+    font-weight: 900;
+    line-height: 1.15;
+    margin-bottom: 12px;
+  }
+  .hero h1 span { color: var(--accent2); }
+  .hero-sub {
+    font-size: 15px;
+    color: rgba(255,255,255,0.65);
+    margin-bottom: 8px;
+    font-style: italic;
+  }
+  .hero p {
+    font-size: 15px;
+    color: rgba(255,255,255,0.75);
+    line-height: 1.7;
+    margin-bottom: 32px;
+    max-width: 440px;
+  }
+  .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--accent);
+    color: white;
+    padding: 13px 28px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
+    transition: all 0.2s;
+    box-shadow: 0 4px 16px rgba(200,147,42,0.4);
+  }
+  .btn-primary:hover { background: #b8821f; transform: translateY(-1px); }
+  .btn-outline {
+    background: transparent;
+    color: white;
+    padding: 13px 28px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
+    border: 1.5px solid rgba(255,255,255,0.3);
+    transition: all 0.2s;
+  }
+  .btn-outline:hover { background: rgba(255,255,255,0.1); }
+
+  /* SEARCH CARD */
+  .search-card {
+    background: rgba(255,255,255,0.07);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 20px;
+    padding: 32px;
+    animation: fadeInRight 0.8s ease;
+  }
+  @keyframes fadeInRight { from { opacity:0; transform:translateX(30px); } to { opacity:1; transform:translateX(0); } }
+  .search-card h3 { color: white; font-size: 18px; font-weight: 600; margin-bottom: 20px; }
+  .search-box {
+    display: flex;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  }
+  .search-box input {
+    flex: 1;
+    border: none;
+    padding: 14px 18px;
+    font-size: 14px;
+    outline: none;
+    font-family: inherit;
+    color: var(--text);
+  }
+  .search-box button {
+    background: var(--accent);
+    border: none;
+    padding: 14px 22px;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .search-box button:hover { background: #b8821f; }
+  .search-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+  .search-tags span { font-size: 11px; color: rgba(255,255,255,0.5); }
+  .search-tags a {
+    background: rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.75);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    text-decoration: none;
+    border: 1px solid rgba(255,255,255,0.15);
+    transition: background 0.2s;
+  }
+  .search-tags a:hover { background: rgba(255,255,255,0.2); }
+
+  /* STATS BAR */
+  .stats-bar {
+    background: var(--accent);
+    padding: 20px 40px;
+  }
+  .stats-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+  }
+  .stat { text-align: center; color: white; }
+  .stat-num { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; display: block; }
+  .stat-label { font-size: 12px; opacity: 0.85; }
+  .stat-divider { width: 1px; height: 40px; background: rgba(255,255,255,0.3); }
+
+  /* SECTION */
+  section { padding: 64px 40px; }
+  .section-inner { max-width: 1280px; margin: 0 auto; }
+  .section-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 36px; }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--primary);
+  }
+  .section-title span { color: var(--accent); }
+  .section-subtitle { color: var(--muted); font-size: 14px; margin-top: 4px; }
+  .view-all { color: var(--accent); font-size: 13px; font-weight: 600; text-decoration: none; display: flex; align-items: center; gap:4px; }
+  .view-all:hover { text-decoration: underline; }
+
+  /* CATEGORY CARDS */
+  .categories-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .cat-card {
+    background: var(--white);
+    border-radius: 14px;
+    padding: 24px 20px;
+    text-align: center;
+    text-decoration: none;
+    border: 1.5px solid var(--border);
+    transition: all 0.25s;
+    cursor: pointer;
+  }
+  .cat-card:hover { border-color: var(--accent); transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.08); }
+  .cat-icon { font-size: 32px; margin-bottom: 10px; display: block; }
+  .cat-name { font-size: 14px; font-weight: 600; color: var(--primary); display: block; margin-bottom: 4px; }
+  .cat-count { font-size: 12px; color: var(--muted); }
+
+  /* BOOK CARDS */
+  .books-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; }
+  .book-card {
+    background: var(--white);
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1.5px solid var(--border);
+    transition: all 0.25s;
+    cursor: pointer;
+  }
+  .book-card:hover { transform: translateY(-5px); box-shadow: 0 16px 40px rgba(0,0,0,0.1); border-color: var(--accent); }
+  .book-cover {
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    position: relative;
+    overflow: hidden;
+  }
+  .book-cover-1 { background: linear-gradient(135deg, #1a3a5c, #2a6aad); }
+  .book-cover-2 { background: linear-gradient(135deg, #7c3aed, #a855f7); }
+  .book-cover-3 { background: linear-gradient(135deg, #059669, #10b981); }
+  .book-cover-4 { background: linear-gradient(135deg, #dc2626, #f87171); }
+  .book-cover-5 { background: linear-gradient(135deg, #d97706, #fbbf24); }
+  .book-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: var(--accent);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+  }
+  .book-info { padding: 14px 16px; }
+  .book-info h4 { font-size: 13px; font-weight: 600; color: var(--primary); margin-bottom: 4px; line-height: 1.4; }
+  .book-info .author { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+  .book-info .book-meta { display: flex; justify-content: space-between; align-items: center; }
+  .book-type { font-size: 11px; background: #eff6ff; color: #1d4ed8; padding: 2px 8px; border-radius: 4px; font-weight: 500; }
+  .book-year { font-size: 11px; color: var(--muted); }
+
+  /* MARQUEE NEWS */
+  .news-bar {
+    background: var(--primary);
+    padding: 12px 40px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    overflow: hidden;
+  }
+  .news-label {
+    background: var(--accent);
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 4px;
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .news-scroll {
+    overflow: hidden;
+    flex: 1;
+  }
+  .news-track {
+    display: flex;
+    gap: 60px;
+    animation: marquee 30s linear infinite;
+    white-space: nowrap;
+  }
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  .news-track a { color: rgba(255,255,255,0.8); text-decoration: none; font-size: 13px; }
+  .news-track a:hover { color: var(--accent2); }
+  .news-track span { color: var(--accent2); margin-right: 8px; }
+
+  /* SERVICES SECTION */
+  .services-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .service-card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 28px;
+    border: 1.5px solid var(--border);
+    transition: all 0.25s;
+  }
+  .service-card:hover { border-color: var(--accent); box-shadow: 0 12px 32px rgba(0,0,0,0.07); }
+  .service-icon {
+    width: 52px; height: 52px;
+    background: linear-gradient(135deg, var(--primary), #2a5a8c);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    margin-bottom: 16px;
+  }
+  .service-card h3 { font-size: 16px; font-weight: 600; color: var(--primary); margin-bottom: 8px; }
+  .service-card p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+  /* ANNOUNCEMENT */
+  .announce-section { background: var(--primary); }
+  .announce-inner {
+    max-width: 1280px; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;
+  }
+  .announce-content { color: white; }
+  .announce-content h2 { font-family: 'Playfair Display', serif; font-size: 32px; margin-bottom: 16px; }
+  .announce-content p { color: rgba(255,255,255,0.7); line-height: 1.7; font-size: 14px; margin-bottom: 24px; }
+  .announce-list { list-style: none; }
+  .announce-list li {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.1);
+    font-size: 13px; color: rgba(255,255,255,0.8);
+  }
+  .announce-list li span { color: var(--accent2); font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .announce-card {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 16px;
+    padding: 28px;
+  }
+  .announce-card h3 { color: var(--accent2); font-size: 16px; font-weight: 600; margin-bottom: 16px; }
+  .announce-item {
+    display: flex; gap: 14px; padding: 12px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .announce-date {
+    background: var(--accent);
+    color: white;
+    min-width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700;
+    text-transform: uppercase; line-height: 1.2;
+    flex-shrink: 0;
+  }
+  .announce-date .day { font-size: 18px; font-weight: 900; }
+  .announce-item-text { color: rgba(255,255,255,0.8); font-size: 13px; line-height: 1.5; }
+  .announce-item-text small { color: rgba(255,255,255,0.4); font-size: 11px; }
+
+  /* FOOTER */
+  footer {
+    background: #0a1628;
+    color: rgba(255,255,255,0.6);
+    padding: 48px 40px 24px;
+  }
+  .footer-grid {
+    max-width: 1280px; margin: 0 auto;
+    display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .footer-brand .logo-text .name { color: white; font-size: 22px; }
+  .footer-brand p { font-size: 13px; line-height: 1.7; margin-top: 12px; margin-bottom: 20px; }
+  .social-links { display: flex; gap: 10px; }
+  .social-link {
+    width: 36px; height: 36px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: white; text-decoration: none; font-size: 15px;
+    transition: background 0.2s;
+  }
+  .social-link:hover { background: var(--accent); }
+  .footer-col h4 { color: white; font-size: 14px; font-weight: 600; margin-bottom: 16px; }
+  .footer-col ul { list-style: none; }
+  .footer-col ul li { margin-bottom: 9px; }
+  .footer-col ul li a { color: rgba(255,255,255,0.55); text-decoration: none; font-size: 13px; transition: color 0.2s; }
+  .footer-col ul li a:hover { color: var(--accent2); }
+  .footer-bottom {
+    max-width: 1280px; margin: 20px auto 0;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 12px;
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeInUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+  .hero-content { animation: fadeInUp 0.7s ease; }
+
+  /* SCROLL TICKER */
+  .ticker-wrap {
+    background: #f0ebe0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 0;
+    overflow: hidden;
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <span>📍 បន្ទាយមានជ័យ, កម្ពុជា &nbsp;|&nbsp; ម៉ោងបើក: ច័ន្ទ-សុក្រ 7:30-17:00</span>
+  <div>
+    <a href="#">📞 077 822 177</a>
+    <a href="#">✉ library@linmu.edu.kh</a>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="logo-section">
+      <div class="logo-icon">📚</div>
+      <div class="logo-text">
+        <span class="name">LiNMU</span>
+        <span class="sub">Hun Sen Digital Library</span>
+      </div>
+    </a>
+
+    <ul class="nav-links">
+      <li><a href="#" class="active">ទំព័រដើម</a></li>
+      <li>
+        <a href="#">អំពីបណ្ណាល័យ ▾</a>
+        <div class="dropdown">
+          <a href="#">សាវតារបណ្ណាល័យ</a>
+          <a href="#">រូបភាពបណ្ណាល័យ</a>
+          <a href="#">ប្លង់ជាន់ទី១</a>
+          <a href="#">ប្លង់ជាន់ទី២</a>
+        </div>
+      </li>
+      <li>
+        <a href="#">ធនធានឯកសារ ▾</a>
+        <div class="dropdown">
+          <a href="#">និក្ខេបបទបណ្ឌិត</a>
+          <a href="#">និក្ខេបបទមហាជន</a>
+          <a href="#">ទស្សនាវដ្តី</a>
+          <a href="#">ឯកសារថ្នាក់មូលដ្ឋាន</a>
+        </div>
+      </li>
+      <li>
+        <a href="#">សៀវភៅជំនាញ ▾</a>
+        <div class="dropdown">
+          <a href="#">Management</a>
+          <a href="#">Accounting & Finance</a>
+          <a href="#">Information Technology</a>
+          <a href="#">Economics</a>
+          <a href="#">Law</a>
+          <a href="#">Tourism</a>
+        </div>
+      </li>
+      <li><a href="#">ឯកសារថ្មីៗ</a></li>
+      <li><a href="#">ទំនាក់ទំនង</a></li>
+    </ul>
+
+    <div class="nav-actions">
+      <a href="#" class="lang-btn">🇰🇭 ខ្មែរ</a>
+      <a href="login.html" class="btn-login">🔐 ចូលគណនី</a>
+    </div>
+  </div>
+</nav>
+
+<!-- NEWS TICKER -->
+<div class="news-bar">
+  <span class="news-label">📢 ព័ត៌មាន</span>
+  <div class="news-scroll">
+    <div class="news-track">
+      <a href="#"><span>●</span>ការចុះឈ្មោះជាសមាជិកថ្មីសម្រាប់ឆ្នាំ ២០២៦ បានបើកហើយ</a>
+      <a href="#"><span>●</span>បណ្ណាល័យបានបន្ថែមសៀវភៅថ្មីជាង ២០០ ក្បាល</a>
+      <a href="#"><span>●</span>ម៉ោងបើកបណ្ណាល័យ: ច័ន្ទ ដល់ សុក្រ ម៉ោង ៧:៣០ ដល់ ១៧:០០</a>
+      <a href="#"><span>●</span>New arrival: Computer Science &amp; Digital Economy books added</a>
+      <a href="#"><span>●</span>ការចុះឈ្មោះជាសមាជិកថ្មីសម្រាប់ឆ្នាំ ២០២៦ បានបើកហើយ</a>
+      <a href="#"><span>●</span>បណ្ណាល័យបានបន្ថែមសៀវភៅថ្មីជាង ២០០ ក្បាល</a>
+      <a href="#"><span>●</span>ម៉ោងបើកបណ្ណាល័យ: ច័ន្ទ ដល់ សុក្រ ម៉ោង ៧:៣០ ដល់ ១៧:០០</a>
+      <a href="#"><span>●</span>New arrival: Computer Science &amp; Digital Economy books added</a>
+    </div>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-orb hero-orb-1"></div>
+  <div class="hero-orb hero-orb-2"></div>
+  <div class="hero-inner">
+    <div class="hero-content">
+      <div class="hero-badge">🎓 Hun Sen E-Library</div>
+      <h1>បណ្ណាល័យ<br><span>ឌីជីថល</span><br>LiNMU</h1>
+      <p class="hero-sub">National MeanChey University </p>
+      <p>ស្វែងរកចំណេះដឹងគ្មានដែនកំណត់ — ចូលប្រើប្រាស់ឯកសារ, សៀវភៅ, និក្ខេបបទ និងធនធានការសិក្សាពីគ្រប់ទីកន្លែង។</p>
+      <div class="hero-btns">
+        <a href="books.html" class="btn-primary">📖 ស្វែងរកសៀវភៅ</a>
+        <a href="login.html" class="btn-outline">🔐 ចូលគណនី</a>
+      </div>
+    </div>
+    <div class="search-card">
+      <h3>🔍 ស្វែងរកធនធាន</h3>
+      <div class="search-box">
+        <input type="text" placeholder="វាយបញ្ចូលឈ្មោះសៀវភៅ, អ្នកនិពន្ធ...">
+        <button>🔍</button>
+      </div>
+      <div class="search-tags">
+        <span>ពាក្យគន្លឹះ:</span>
+        <a href="#">Management</a>
+        <a href="#">IT</a>
+        <a href="#">Law</a>
+        <a href="#">Economics</a>
+        <a href="#">Tourism</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stats-inner">
+    <div class="stat"><span class="stat-num">15,000+</span><span class="stat-label">ចំនួនសៀវភៅ</span></div>
+    <div class="stat-divider"></div>
+    <div class="stat"><span class="stat-num">8,500+</span><span class="stat-label">និក្ខេបបទ</span></div>
+    <div class="stat-divider"></div>
+    <div class="stat"><span class="stat-num">12,000+</span><span class="stat-label">សមាជិក</span></div>
+    <div class="stat-divider"></div>
+    <div class="stat"><span class="stat-num">50+</span><span class="stat-label">មហាវិទ្យាល័យ</span></div>
+    <div class="stat-divider"></div>
+    <div class="stat"><span class="stat-num">24/7</span><span class="stat-label">ចូលប្រើ Online</span></div>
+  </div>
+</div>
+
+<!-- CATEGORIES -->
+<section style="background: var(--white);">
+  <div class="section-inner">
+    <div class="section-header">
+      <div>
+        <div class="section-title">ជំនាញ<span> សិក្សា</span></div>
+        <div class="section-subtitle">ជ្រើសរើសសៀវភៅតាមជំនាញដែលអ្នកចង់បាន</div>
+      </div>
+      <a href="#" class="view-all">មើលទាំងអស់ →</a>
+    </div>
+    <div class="categories-grid">
+      <a href="#" class="cat-card"><span class="cat-icon">💼</span><span class="cat-name">Management</span><span class="cat-count">1,240 ក្បាល</span></a>
+      <a href="#" class="cat-card"><span class="cat-icon">💻</span><span class="cat-name">Information Technology</span><span class="cat-count">980 ក្បាល</span></a>
+      <a href="#" class="cat-card"><span class="cat-icon">⚖️</span><span class="cat-name">Law</span><span class="cat-count">750 ក្បាល</span></a>
+      <a href="#" class="cat-card"><span class="cat-icon">📈</span><span class="cat-name">Accounting & Finance</span><span class="cat-count">1,100 ក្បាល</span></a>
+      <a href="#" class="cat-card"><span class="cat-icon">🌍</span><span class="cat-name">Economics</span><span class="cat-count">890 ក្បាល</span></a>
+      <a href="#" class="cat-card"><span class="cat-icon">✈️</span><span class="cat-name">Tourism</span><span class="cat-count">620 ក្បាល</span></a>
+      <a href="#" class="cat-card"><span class="cat-icon">🏙️</span><span class="cat-name">Digital Economy</span><span class="cat-count">430 ក្បាល</span></a>
+      <a href="#" class="cat-card"><span class="cat-icon">🗣️</span><span class="cat-name">English Language</span><span class="cat-count">560 ក្បាល</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- NEW BOOKS -->
+<section>
+  <div class="section-inner">
+    <div class="section-header">
+      <div>
+        <div class="section-title">សៀវភៅ<span> ថ្មីៗ</span></div>
+        <div class="section-subtitle">ឯកសារ និងសៀវភៅដែលបានបន្ថែមថ្មីៗ</div>
+      </div>
+      <a href="#" class="view-all">មើលទាំងអស់ →</a>
+    </div>
+    <div class="books-grid">
+      <div class="book-card">
+        <div class="book-cover book-cover-1"><span>📘</span><span class="book-badge">New</span></div>
+        <div class="book-info">
+          <h4>Principles of Management 2025</h4>
+          <div class="author">Robert L. Katz</div>
+          <div class="book-meta"><span class="book-type">Management</span><span class="book-year">2025</span></div>
+        </div>
+      </div>
+      <div class="book-card">
+        <div class="book-cover book-cover-2"><span>💜</span><span class="book-badge">Hot</span></div>
+        <div class="book-info">
+          <h4>Introduction to Computer Science</h4>
+          <div class="author">John J. Donovan</div>
+          <div class="book-meta"><span class="book-type">IT</span><span class="book-year">2024</span></div>
+        </div>
+      </div>
+      <div class="book-card">
+        <div class="book-cover book-cover-3"><span>📗</span></div>
+        <div class="book-info">
+          <h4>Financial Accounting Basics</h4>
+          <div class="author">Warren Reeve Duchac</div>
+          <div class="book-meta"><span class="book-type">Finance</span><span class="book-year">2024</span></div>
+        </div>
+      </div>
+      <div class="book-card">
+        <div class="book-cover book-cover-4"><span>📕</span><span class="book-badge">New</span></div>
+        <div class="book-info">
+          <h4>Cambodia Legal System</h4>
+          <div class="author">Dr. Chan Sopheak</div>
+          <div class="book-meta"><span class="book-type">Law</span><span class="book-year">2025</span></div>
+        </div>
+      </div>
+      <div class="book-card">
+        <div class="book-cover book-cover-5"><span>📙</span></div>
+        <div class="book-info">
+          <h4>Tourism Management in SEA</h4>
+          <div class="author">Lim Sokha</div>
+          <div class="book-meta"><span class="book-type">Tourism</span><span class="book-year">2024</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section style="background: var(--white);">
+  <div class="section-inner">
+    <div class="section-header">
+      <div>
+        <div class="section-title">សេវា<span>កម្ម</span></div>
+        <div class="section-subtitle">សេវាកម្មដែលបណ្ណាល័យផ្តល់ជូន</div>
+      </div>
+    </div>
+    <div class="services-grid">
+      <div class="service-card">
+        <div class="service-icon">📖</div>
+        <h3>ខ្ចី និងសងសៀវភៅ</h3>
+        <p>ខ្ចីសៀវភៅបានរហូតដល់ ២ សប្តាហ៍ ដោយត្រូវមានប័ណ្ណសមាជិកបណ្ណាល័យ។</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">🖥️</div>
+        <h3>ឯកសារ Online</h3>
+        <p>ចូលប្រើប្រាស់ឯកសារ, PDF, និក្ខេបបទ ពីគ្រប់ទីកន្លែងតាមរយៈ Account.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">🪑</div>
+        <h3>បន្ទប់ពិគ្រោះយោបល់</h3>
+        <p>កក់បន្ទប់ Group Study សម្រាប់ ២-១០ នាក់ ឥតគិតថ្លៃ។</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">🎓</div>
+        <h3>ចុះឈ្មោះជាសមាជិក</h3>
+        <p>ចូលរួមជាសមាជិកបណ្ណាល័យ ដើម្បីទទួលបានសិទ្ធិចូលប្រើប្រាស់ពេញលេញ។</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">🔍</div>
+        <h3>ជំនួយការស្រាវជ្រាវ</h3>
+        <p>ក្រុមការងាររបស់យើងត្រៀមផ្តល់ជំនួយក្នុងការស្រាវជ្រាវ និងស្វែងរកឯកសារ។</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">📱</div>
+        <h3>Join Telegram</h3>
+        <p>ចូលក្រុម Telegram ដើម្បីទទួលព័ត៌មានថ្មីៗអំពីសៀវភៅ និងព្រឹត្តិការណ៍ជាប្រចាំ។</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ANNOUNCEMENTS -->
+<section class="announce-section">
+  <div class="announce-inner">
+    <div class="announce-content">
+      <h2>ព័ត៌មាន &amp;<br>សកម្មភាព</h2>
+      <p>ព័ត៌មានថ្មីៗ, ព្រឹត្តិការណ៍ និងការជូនដំណឹងពីបណ្ណាល័យ LiNMU។</p>
+      <ul class="announce-list">
+        <li><span>📚</span>សៀវភៅជំនាញ IT ថ្មីបានមកដល់ — ២០០ ក្បាល</li>
+        <li><span>🎓</span>ការចុះឈ្មោះជាសមាជិករបស់និស្សិតឆ្នាំទី ១ ឆ្នាំ ២០២៦</li>
+        <li><span>🏛️</span>បណ្ណាល័យបានជួសជុលបន្ទប់អានសៀវភៅជាន់ទី ២</li>
+        <li><span>🌐</span>ប្រព័ន្ធ E-Library បានធ្វើការ Update ថ្មី</li>
+      </ul>
+    </div>
+    <div class="announce-card">
+      <h3>📅 ព្រឹត្តិការណ៍ខាងមុខ</h3>
+      <div class="announce-item">
+        <div class="announce-date"><span class="day">15</span>May</div>
+        <div class="announce-item-text">ពិធីបើកសម្ពោធបន្ទប់ E-Learning ថ្មីជាន់ទី ១<small><br>ម៉ោង ៩:០០ - ១១:០០ ព្រឹក</small></div>
+      </div>
+      <div class="announce-item">
+        <div class="announce-date"><span class="day">20</span>May</div>
+        <div class="announce-item-text">វគ្គបណ្តុះបណ្តាលការស្រាវជ្រាវវិទ្យាសាស្ត្រ<small><br>ម៉ោង ១៣:០០ - ១៦:០០</small></div>
+      </div>
+      <div class="announce-item">
+        <div class="announce-date"><span class="day">01</span>Jun</div>
+        <div class="announce-item-text">ថ្ងៃចុះឈ្មោះជាសមាជិកដែលអស់ — ត្រូវវាន់ឡើងវិញ<small><br>នៅអគារបណ្ណាល័យ</small></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="logo-section" style="padding:0; margin-bottom:0;">
+        <div class="logo-icon">📚</div>
+        <div class="logo-text">
+          <span class="name" style="color:white;">LiNMU Library</span>
+          <span class="sub">Hun Sen Digital Library</span>
+        </div>
+      </div>
+      <p>បណ្ណាល័យហ៊ុន សែន នៃសាកលវិទ្យាល័យជាតិមានជ័យ — ផ្តល់ជូននូវចំណេះដឹង និងធនធានការអប់រំ ដើម្បីបណ្តុះបណ្តាលជំនាន់ក្រោយ។</p>
+      <div class="social-links">
+        <a href="#" class="social-link">📘</a>
+        <a href="#" class="social-link">✈️</a>
+        <a href="#" class="social-link">📸</a>
+        <a href="#" class="social-link">▶️</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>ធនធាន</h4>
+      <ul>
+        <li><a href="#">សៀវភៅជំនាញ</a></li>
+        <li><a href="#">និក្ខេបបទ</a></li>
+        <li><a href="#">ទស្សនាវដ្តី</a></li>
+        <li><a href="#">ឯកសារថ្មីៗ</a></li>
+        <li><a href="#">Open Source</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>សេវាកម្ម</h4>
+      <ul>
+        <li><a href="#">ចុះឈ្មោះសមាជិក</a></li>
+        <li><a href="#">ខ្ចីសៀវភៅ</a></li>
+        <li><a href="#">កក់បន្ទប់</a></li>
+        <li><a href="#">E-Resources</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>ទំនាក់ទំនង</h4>
+      <ul>
+        <li><a href="#">📞 077 822 177</a></li>
+        <li><a href="#">✉ library@linmu.edu.kh</a></li>
+        <li><a href="#">📍 បន្ទាយមានជ័យ, កម្ពុជា</a></li>
+        <li><a href="#">🕐 ច័ន្ទ-សុក្រ 7:30-17:00</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 LiNMU Library. រក្សាសិទ្ធិគ្រប់យ៉ាង។</span>
+    <span>Built with Spring Boot &amp; ❤️</span>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,33 @@
+# ===== Compiled output =====
+target/
+*.jar
+*.war
+*.class
+
+# ===== Secrets & config =====
+*.env
+.env
+application-secrets.properties
+application-local.properties
+
+# ===== IDE files =====
+.idea/
+*.iml
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# ===== OS files =====
+.DS_Store
+Thumbs.db
+
+# ===== Logs =====
+*.log
+logs/
+
+# ===== Maven wrapper (optional, keep if you want) =====
+# .mvn/
+# mvnw
+# mvnw.cmd

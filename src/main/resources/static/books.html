@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LiNMU — ស្វែងរកសៀវភៅ</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #1a3a5c;
+    --accent: #c8932a;
+    --accent2: #e8b84b;
+    --light: #f5f0e8;
+    --white: #ffffff;
+    --text: #1a1a2e;
+    --muted: #6b7280;
+    --border: #e5e0d5;
+    --success: #059669;
+    --error: #dc2626;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--light); color: var(--text); min-height: 100vh; }
+
+  /* NAV */
+  nav { background: var(--white); box-shadow: 0 2px 16px rgba(0,0,0,0.07); position: sticky; top: 0; z-index: 100; }
+  .nav-inner { max-width: 1280px; margin: 0 auto; padding: 0 40px; display: flex; align-items: center; gap: 24px; }
+  .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; padding: 14px 0; min-width: 180px; }
+  .logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary), #2a5a8c); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .logo span { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--primary); }
+  .nav-links { display: flex; gap: 4px; flex: 1; }
+  .nav-links a { padding: 12px 14px; color: var(--muted); text-decoration: none; font-size: 13.5px; font-weight: 500; border-radius: 8px; transition: all 0.2s; }
+  .nav-links a:hover, .nav-links a.active { color: var(--primary); background: var(--light); }
+  .nav-links a.active { color: var(--accent); }
+  .nav-right { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+  .user-badge { display: flex; align-items: center; gap: 8px; background: var(--light); border-radius: 20px; padding: 6px 14px 6px 8px; font-size: 13px; font-weight: 500; }
+  .user-avatar { width: 28px; height: 28px; background: var(--primary); border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+  .btn-logout { padding: 8px 16px; border: 1.5px solid var(--border); border-radius: 8px; background: none; font-size: 13px; cursor: pointer; font-family: inherit; color: var(--muted); transition: all 0.2s; }
+  .btn-logout:hover { border-color: var(--error); color: var(--error); }
+
+  /* HERO SEARCH */
+  .search-hero { background: linear-gradient(135deg, var(--primary), #0f2640); padding: 48px 40px; position: relative; overflow: hidden; }
+  .search-hero::after { content: '📚'; position: absolute; right: 80px; top: 50%; transform: translateY(-50%); font-size: 120px; opacity: 0.05; pointer-events: none; }
+  .search-hero-inner { max-width: 1280px; margin: 0 auto; }
+  .search-hero h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; color: white; margin-bottom: 6px; }
+  .search-hero h1 span { color: var(--accent2); }
+  .search-hero p { color: rgba(255,255,255,0.6); font-size: 14px; margin-bottom: 28px; }
+  .search-bar { display: flex; background: white; border-radius: 14px; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.2); max-width: 800px; }
+  .search-select { border: none; border-right: 1.5px solid var(--border); padding: 0 18px; font-size: 13px; font-family: inherit; color: var(--text); background: #f9f9f9; outline: none; cursor: pointer; min-width: 130px; }
+  .search-bar input { flex: 1; border: none; padding: 16px 20px; font-size: 15px; font-family: inherit; color: var(--text); outline: none; }
+  .search-bar button { background: var(--accent); border: none; padding: 16px 28px; color: white; font-size: 15px; cursor: pointer; font-family: inherit; font-weight: 600; transition: background 0.2s; display: flex; align-items: center; gap: 8px; }
+  .search-bar button:hover { background: #b8821f; }
+  .search-hints { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; align-items: center; }
+  .search-hints span { color: rgba(255,255,255,0.45); font-size: 12px; }
+  .hint-tag { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.75); border: 1px solid rgba(255,255,255,0.15); padding: 4px 12px; border-radius: 20px; font-size: 12px; cursor: pointer; transition: background 0.2s; }
+  .hint-tag:hover { background: rgba(255,255,255,0.2); }
+
+  /* MAIN LAYOUT */
+  .main { max-width: 1280px; margin: 0 auto; padding: 32px 40px; display: grid; grid-template-columns: 240px 1fr; gap: 28px; align-items: start; }
+
+  /* SIDEBAR */
+  .sidebar { position: sticky; top: 80px; }
+  .filter-card { background: var(--white); border-radius: 14px; padding: 24px; border: 1.5px solid var(--border); margin-bottom: 16px; }
+  .filter-title { font-size: 13px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; }
+  .filter-title button { background: none; border: none; color: var(--accent); font-size: 11px; cursor: pointer; font-family: inherit; font-weight: 600; }
+  .filter-item { display: flex; align-items: center; gap: 10px; padding: 7px 0; cursor: pointer; }
+  .filter-item input { accent-color: var(--primary); cursor: pointer; }
+  .filter-item label { font-size: 13px; color: var(--text); cursor: pointer; flex: 1; display: flex; justify-content: space-between; }
+  .filter-count { background: var(--light); color: var(--muted); font-size: 11px; padding: 1px 7px; border-radius: 10px; }
+
+  /* RESULTS */
+  .results-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+  .results-count { font-size: 14px; color: var(--muted); }
+  .results-count strong { color: var(--primary); font-size: 16px; }
+  .sort-wrap { display: flex; align-items: center; gap: 10px; }
+  .sort-wrap label { font-size: 13px; color: var(--muted); }
+  .sort-select { border: 1.5px solid var(--border); padding: 7px 12px; border-radius: 8px; font-size: 13px; font-family: inherit; background: var(--white); color: var(--text); outline: none; cursor: pointer; }
+  .view-toggle { display: flex; gap: 4px; }
+  .view-btn { width: 34px; height: 34px; border: 1.5px solid var(--border); border-radius: 8px; background: var(--white); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+  .view-btn.active { background: var(--primary); border-color: var(--primary); color: white; }
+
+  /* BOOK GRID */
+  #booksContainer { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+  #booksContainer.list-view { grid-template-columns: 1fr; }
+  .book-card { background: var(--white); border-radius: 14px; overflow: hidden; border: 1.5px solid var(--border); transition: all 0.25s; cursor: pointer; }
+  .book-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.1); border-color: var(--accent); }
+  .book-cover { height: 160px; display: flex; align-items: center; justify-content: center; font-size: 44px; position: relative; }
+  .book-cover.c0 { background: linear-gradient(135deg, #1a3a5c, #2a6aad); }
+  .book-cover.c1 { background: linear-gradient(135deg, #7c3aed, #a855f7); }
+  .book-cover.c2 { background: linear-gradient(135deg, #059669, #10b981); }
+  .book-cover.c3 { background: linear-gradient(135deg, #dc2626, #f87171); }
+  .book-cover.c4 { background: linear-gradient(135deg, #d97706, #fbbf24); }
+  .book-cover.c5 { background: linear-gradient(135deg, #0891b2, #22d3ee); }
+  .book-badge-new { position: absolute; top: 10px; left: 10px; background: var(--accent); color: white; font-size: 9px; font-weight: 700; padding: 3px 7px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .book-qty { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.4); color: white; font-size: 10px; padding: 3px 8px; border-radius: 4px; }
+
+  /* ✅ PDF badge on cover */
+  .book-pdf-badge { position: absolute; bottom: 10px; left: 10px; background: rgba(5,150,105,0.9); color: white; font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 4px; }
+  /* ✅ PDF overlay when hovering a card that has PDF */
+  .book-cover .pdf-hover-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.55); color: white; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; opacity: 0; transition: opacity 0.2s; border-radius: 0; gap: 6px; }
+  .book-card.has-pdf .book-cover:hover .pdf-hover-overlay { opacity: 1; }
+
+  .book-info { padding: 14px 16px; }
+  .book-info h4 { font-size: 13px; font-weight: 600; color: var(--primary); margin-bottom: 4px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .book-author { font-size: 11px; color: var(--muted); margin-bottom: 8px; }
+  .book-footer { display: flex; justify-content: space-between; align-items: center; }
+  .book-tag { font-size: 10px; background: #eff6ff; color: #1d4ed8; padding: 2px 8px; border-radius: 4px; font-weight: 500; }
+  .book-isbn { font-size: 10px; color: var(--muted); }
+  .btn-borrow { width: 100%; margin-top: 10px; padding: 8px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 12px; font-weight: 600; font-family: inherit; cursor: pointer; transition: background 0.2s; }
+  .btn-borrow:hover { background: var(--accent); }
+
+  /* LIST VIEW */
+  #booksContainer.list-view .book-card { display: flex; align-items: center; }
+  #booksContainer.list-view .book-cover { width: 100px; height: 100px; flex-shrink: 0; font-size: 28px; border-radius: 0; }
+  #booksContainer.list-view .book-info { flex: 1; display: flex; align-items: center; gap: 20px; padding: 16px 20px; }
+  #booksContainer.list-view .book-info h4 { font-size: 15px; -webkit-line-clamp: 1; min-width: 200px; }
+  #booksContainer.list-view .btn-borrow { width: auto; margin: 0; padding: 8px 20px; white-space: nowrap; }
+
+  /* SKELETON */
+  .skeleton { background: var(--white); border-radius: 14px; overflow: hidden; border: 1.5px solid var(--border); }
+  .skeleton-cover { height: 160px; background: linear-gradient(90deg, #f0ebe0 25%, #e8e3d8 50%, #f0ebe0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+  .skeleton-body { padding: 14px 16px; }
+  .skeleton-line { height: 12px; border-radius: 4px; margin-bottom: 8px; background: linear-gradient(90deg, #f0ebe0 25%, #e8e3d8 50%, #f0ebe0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+  .skeleton-line.short { width: 60%; }
+  @keyframes shimmer { to { background-position: -200% 0; } }
+
+  /* EMPTY STATE */
+  .empty-state { grid-column: 1 / -1; text-align: center; padding: 60px 20px; }
+  .empty-state .icon { font-size: 60px; margin-bottom: 16px; }
+  .empty-state h3 { font-size: 18px; color: var(--primary); margin-bottom: 8px; }
+  .empty-state p { color: var(--muted); font-size: 14px; }
+
+  /* MODAL */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+  .modal-overlay.show { display: flex; }
+  .modal { background: var(--white); border-radius: 20px; padding: 36px; max-width: 520px; width: 90%; position: relative; animation: modalIn 0.3s ease; max-height: 90vh; overflow-y: auto; }
+  @keyframes modalIn { from { transform: scale(0.9); opacity:0; } to { transform: scale(1); opacity:1; } }
+  .modal-close { position: absolute; top: 16px; right: 16px; background: var(--light); border: none; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; font-size: 16px; color: var(--muted); transition: background 0.2s; }
+  .modal-close:hover { background: var(--border); }
+  .modal-cover { height: 120px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 50px; margin-bottom: 20px; }
+  .modal h2 { font-size: 20px; font-weight: 700; color: var(--primary); margin-bottom: 6px; }
+  .modal-author { color: var(--muted); font-size: 14px; margin-bottom: 16px; }
+  .modal-details { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+  .detail-item { background: var(--light); border-radius: 8px; padding: 10px 14px; }
+  .detail-item .label { font-size: 11px; color: var(--muted); margin-bottom: 3px; }
+  .detail-item .value { font-size: 14px; font-weight: 600; color: var(--primary); }
+  .btn-borrow-modal { width: 100%; padding: 13px; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; transition: all 0.2s; margin-bottom: 12px; }
+  .btn-borrow-modal:hover { background: var(--accent); }
+
+  /* ✅ PDF SECTION IN MODAL */
+  .pdf-section { border-top: 1.5px solid var(--border); padding-top: 16px; margin-top: 4px; }
+  .pdf-section-title { font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+  .pdf-status { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-size: 13px; }
+  .pdf-status.has-pdf { color: var(--success); }
+  .pdf-status.no-pdf { color: var(--muted); }
+  .btn-view-pdf { display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px; background: var(--success); color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; transition: background 0.2s; text-decoration: none; margin-bottom: 10px; width: 100%; justify-content: center; }
+  .btn-view-pdf:hover { background: #047857; }
+  .pdf-upload-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 8px; }
+  .pdf-file-input { flex: 1; font-size: 12px; font-family: inherit; padding: 7px; border: 1.5px solid var(--border); border-radius: 8px; background: var(--light); min-width: 0; }
+  .btn-upload-pdf { padding: 8px 14px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 12px; font-weight: 600; font-family: inherit; cursor: pointer; white-space: nowrap; transition: background 0.2s; }
+  .btn-upload-pdf:hover { background: #0f2640; }
+  .btn-delete-pdf { padding: 8px 14px; background: none; color: var(--error); border: 1.5px solid var(--error); border-radius: 8px; font-size: 12px; font-weight: 600; font-family: inherit; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
+  .btn-delete-pdf:hover { background: var(--error); color: white; }
+  .pdf-message { font-size: 12px; padding: 6px 10px; border-radius: 6px; margin-top: 4px; display: none; }
+  .pdf-message.success { background: #d1fae5; color: var(--success); display: block; }
+  .pdf-message.error { background: #fee2e2; color: var(--error); display: block; }
+  .pdf-message.info { background: #e0f2fe; color: #0369a1; display: block; }
+
+  /* TOAST */
+  .toast { position: fixed; bottom: 28px; right: 28px; background: var(--primary); color: white; padding: 14px 20px; border-radius: 12px; font-size: 13px; font-weight: 500; box-shadow: 0 8px 24px rgba(0,0,0,0.2); transform: translateY(80px); opacity: 0; transition: all 0.3s; z-index: 9999; display: flex; align-items: center; gap: 10px; }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  /* ADD BOOK FORM */
+  .add-book-btn { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; gap: 6px; }
+  .add-book-btn:hover { background: #b8821f; }
+  .add-form { background: var(--white); border-radius: 14px; padding: 24px; border: 1.5px solid var(--border); margin-bottom: 20px; display: none; }
+  .add-form.show { display: block; }
+  .add-form h3 { font-size: 16px; font-weight: 600; color: var(--primary); margin-bottom: 18px; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+  .form-field label { display: block; font-size: 12px; font-weight: 500; color: var(--muted); margin-bottom: 5px; }
+  .form-field input, .form-field select { width: 100%; padding: 9px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 13px; font-family: inherit; color: var(--text); outline: none; background: var(--light); transition: border-color 0.2s; }
+  .form-field input:focus, .form-field select:focus { border-color: var(--primary); background: white; }
+  .form-actions { display: flex; gap: 10px; justify-content: flex-end; }
+  .btn-save { background: var(--primary); color: white; border: none; padding: 9px 22px; border-radius: 8px; font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; transition: background 0.2s; }
+  .btn-save:hover { background: #0f2640; }
+  .btn-cancel-form { background: none; color: var(--muted); border: 1.5px solid var(--border); padding: 9px 18px; border-radius: 8px; font-size: 13px; font-family: inherit; cursor: pointer; transition: all 0.2s; }
+  .btn-cancel-form:hover { border-color: var(--error); color: var(--error); }
+
+  /* PAGINATION */
+  .pagination { display: flex; justify-content: center; gap: 6px; margin-top: 32px; flex-wrap: wrap; }
+  .page-btn { width: 36px; height: 36px; border: 1.5px solid var(--border); border-radius: 8px; background: var(--white); cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 500; color: var(--text); transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+  .page-btn:hover, .page-btn.active { background: var(--primary); border-color: var(--primary); color: white; }
+  .page-btn.wide { width: auto; padding: 0 14px; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="logo">
+      <div class="logo-icon">📚</div>
+      <span>LiNMU</span>
+    </a>
+    <div class="nav-links">
+      <a href="index.html">ទំព័រដើម</a>
+      <a href="books.html" class="active">📖 សៀវភៅ</a>
+      <a href="#">និក្ខេបបទ</a>
+      <a href="#">ធនធាន</a>
+      <a href="catalog.html">Catalog</a>
+      <a href="book-list.html">BookList</a>
+    </div>
+    <div class="nav-right">
+      <div class="user-badge">
+        <div class="user-avatar">👤</div>
+        <span id="userName">Guest</span>
+      </div>
+      <button class="btn-logout" onclick="logout()">ចាកចេញ</button>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO SEARCH -->
+<div class="search-hero">
+  <div class="search-hero-inner">
+    <h1>ស្វែងរក<span>សៀវភៅ</span></h1>
+    <p>ចូលប្រើប្រាស់ធនធានសៀវភៅជាង ១៥,០០០ ក្បាល</p>
+    <div class="search-bar">
+      <select class="search-select" id="searchField">
+        <option value="all">ទាំងអស់</option>
+        <option value="title">ចំណងជើង</option>
+        <option value="author">អ្នកនិពន្ធ</option>
+        <option value="isbn">ISBN</option>
+      </select>
+      <input type="text" id="searchInput" placeholder="វាយបញ្ចូលចំណងជើង, អ្នកនិពន្ធ, ISBN..."
+             oninput="debounceSearch()" onkeydown="if(event.key==='Enter') searchBooks()">
+      <button onclick="searchBooks()">🔍 ស្វែងរក</button>
+    </div>
+    <div class="search-hints">
+      <span>ចូចចិត្ត:</span>
+      <span class="hint-tag" onclick="quickSearch('Management')">Management</span>
+      <span class="hint-tag" onclick="quickSearch('Computer')">Computer Science</span>
+      <span class="hint-tag" onclick="quickSearch('Law')">Law</span>
+      <span class="hint-tag" onclick="quickSearch('Economics')">Economics</span>
+      <span class="hint-tag" onclick="quickSearch('Finance')">Finance</span>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="filter-card">
+      <div class="filter-title">
+        🏷️ ប្រភេទ
+        <button onclick="clearFilters()">លុបចោល</button>
+      </div>
+      <div class="filter-item"><input type="checkbox" id="f_all" checked onchange="applyFilter('all',this)"><label for="f_all">ទាំងអស់ <span class="filter-count" id="cnt_all">0</span></label></div>
+      <div class="filter-item"><input type="checkbox" id="f_management" onchange="applyFilter('Management',this)"><label for="f_management">Management <span class="filter-count" id="cnt_management">0</span></label></div>
+      <div class="filter-item"><input type="checkbox" id="f_it" onchange="applyFilter('IT',this)"><label for="f_it">IT / Computer <span class="filter-count" id="cnt_it">0</span></label></div>
+      <div class="filter-item"><input type="checkbox" id="f_law" onchange="applyFilter('Law',this)"><label for="f_law">Law <span class="filter-count" id="cnt_law">0</span></label></div>
+      <div class="filter-item"><input type="checkbox" id="f_finance" onchange="applyFilter('Finance',this)"><label for="f_finance">Finance <span class="filter-count" id="cnt_finance">0</span></label></div>
+      <div class="filter-item"><input type="checkbox" id="f_economics" onchange="applyFilter('Economics',this)"><label for="f_economics">Economics <span class="filter-count" id="cnt_economics">0</span></label></div>
+    </div>
+    <div class="filter-card">
+      <div class="filter-title">📦 ស្ថានភាព</div>
+      <div class="filter-item"><input type="checkbox" id="f_available" onchange="filterAvailable(this)"><label for="f_available">មានស្ត็ក <span class="filter-count">✓</span></label></div>
+    </div>
+    <!-- ADD BOOK (admin only) -->
+    <div class="filter-card" id="adminPanel" style="display:none;">
+      <div class="filter-title">⚙️ Admin</div>
+      <button class="add-book-btn" onclick="toggleAddForm()" style="width:100%;justify-content:center;">
+        ➕ បន្ថែមសៀវភៅ
+      </button>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <div>
+    <!-- ADD FORM (admin only, no Thymeleaf) -->
+    <div class="add-form" id="addForm">
+      <h3>➕ បន្ថែមសៀវភៅថ្មី</h3>
+      <div class="form-grid">
+        <div class="form-field"><label>ចំណងជើង *</label><input type="text" id="newTitle" placeholder="ឈ្មោះសៀវភៅ"></div>
+        <div class="form-field"><label>អ្នកនិពន្ធ *</label><input type="text" id="newAuthor" placeholder="ឈ្មោះអ្នកនិពន្ធ"></div>
+        <div class="form-field"><label>ISBN</label><input type="text" id="newIsbn" placeholder="978-..."></div>
+        <div class="form-field"><label>ចំនួន</label><input type="number" id="newQty" value="1" min="1"></div>
+      </div>
+      <div class="form-actions">
+        <button class="btn-cancel-form" onclick="toggleAddForm()">បោះបង់</button>
+        <button class="btn-save" onclick="addBook()">💾 រក្សាទុក</button>
+      </div>
+    </div>
+
+    <!-- RESULTS HEADER -->
+    <div class="results-header">
+      <div class="results-count">
+        បង្ហាញ <strong id="resultCount">0</strong> សៀវភៅ
+        <span id="searchLabel"></span>
+      </div>
+      <div class="sort-wrap">
+        <label>តម្រៀប:</label>
+        <select class="sort-select" onchange="sortBooks(this.value)">
+          <option value="default">លំនាំដើម</option>
+          <option value="title">ចំណងជើង A-Z</option>
+          <option value="author">អ្នកនិពន្ធ</option>
+          <option value="qty_desc">ចំនួន ↓</option>
+          <option value="qty_asc">ចំនួន ↑</option>
+        </select>
+        <div class="view-toggle">
+          <button class="view-btn active" onclick="setView('grid',this)" title="Grid">⊞</button>
+          <button class="view-btn" onclick="setView('list',this)" title="List">☰</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="booksContainer"></div>
+    <div class="pagination" id="pagination"></div>
+  </div>
+</div>
+
+<!-- ✅ BOOK DETAIL MODAL (with PDF section — pure JS, no Thymeleaf) -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" id="bookModal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-cover c0" id="modalCover"></div>
+    <h2 id="modalTitle"></h2>
+    <div class="modal-author" id="modalAuthor"></div>
+    <div class="modal-details">
+      <div class="detail-item"><div class="label">ISBN</div><div class="value" id="modalIsbn">—</div></div>
+      <div class="detail-item"><div class="label">ចំនួននៅ</div><div class="value" id="modalQty"></div></div>
+      <div class="detail-item"><div class="label">ស្ថានភាព</div><div class="value" id="modalStatus"></div></div>
+      <div class="detail-item"><div class="label">ID</div><div class="value" id="modalId"></div></div>
+    </div>
+    <button class="btn-borrow-modal" id="modalBorrowBtn">📖 ខ្ចីសៀវភៅ</button>
+
+    <!-- ✅ PDF SECTION — shown for all users (view) and admin (upload/delete) -->
+    <div class="pdf-section">
+      <div class="pdf-section-title">📄 PDF File</div>
+
+      <!-- Status line -->
+      <div class="pdf-status has-pdf" id="pdfStatusHas" style="display:none;">
+        ✅ PDF បានភ្ជាប់ជាមួយសៀវភៅនេះ
+      </div>
+      <div class="pdf-status no-pdf" id="pdfStatusNone" style="display:none;">
+        ⚠️ មិនទាន់មាន PDF
+      </div>
+
+      <!-- View button (visible to all when PDF exists) -->
+      <a id="btnViewPdf" href="#" target="_blank" class="btn-view-pdf" style="display:none;">
+        📖 អានសៀវភៅ PDF
+      </a>
+
+      <!-- Admin-only: upload / replace / delete -->
+      <div id="pdfAdminControls" style="display:none;">
+        <div class="pdf-upload-row">
+          <input type="file" id="pdfFileInput" accept=".pdf" class="pdf-file-input" />
+          <button class="btn-upload-pdf" onclick="uploadPdf()">⬆️ Upload</button>
+          <button class="btn-delete-pdf" id="btnDeletePdf" onclick="deletePdf()" style="display:none;">🗑 Delete</button>
+        </div>
+        <div class="pdf-message" id="pdfMessage"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+  const COLORS = ['c0','c1','c2','c3','c4','c5'];
+  const EMOJIS = ['📘','📗','📕','📙','📒','📓','📔'];
+  const API = '/books';   // matches @RequestMapping("/books") in BookController
+
+  let allBooks = [];
+  let filtered = [];
+  let currentPage = 1;
+  const PAGE_SIZE = 8;
+  let activeCategory = 'all';
+  let onlyAvailable = false;
+  let currentSearch = '';
+  let debounceTimer;
+  let selectedBookId = null;   // ✅ tracks which book is open in modal
+  let isAdmin = false;
+
+  // ─────────────────────────────────────────────
+  // INIT
+  // ─────────────────────────────────────────────
+  window.onload = () => {
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+    if (!token) { window.location.href = 'login.html'; return; }
+
+    if (user.name) document.getElementById('userName').textContent = user.name;
+
+    isAdmin = (user.role === 'ADMIN');
+    if (isAdmin) {
+      document.getElementById('adminPanel').style.display = 'block';
+    }
+
+    loadBooks();
+  };
+
+  // ─────────────────────────────────────────────
+  // LOAD BOOKS FROM API
+  // ─────────────────────────────────────────────
+  async function loadBooks() {
+    showSkeletons();
+    try {
+      const res = await fetch(API, {
+        headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+      });
+      if (!res.ok) throw new Error();
+      allBooks = await res.json();
+    } catch {
+      // Demo data if API not ready
+      allBooks = [
+        { id:1, title:'Principles of Management', author:'Robert L. Katz', isbn:'978-0136107590', quantity:5, pdfFilePath:'sample.pdf' },
+        { id:2, title:'Introduction to Computer Science', author:'John J. Donovan', isbn:'978-0070175600', quantity:3, pdfFilePath:null },
+        { id:3, title:'Financial Accounting', author:'Warren Reeve Duchac', isbn:'978-1305088436', quantity:8, pdfFilePath:'sample.pdf' },
+        { id:4, title:'Cambodia Legal System', author:'Dr. Chan Sopheak', isbn:'978-9924000001', quantity:2, pdfFilePath:null },
+        { id:5, title:'Tourism Management in Southeast Asia', author:'Lim Sokha', isbn:'978-9924000002', quantity:6, pdfFilePath:null },
+        { id:6, title:'Macroeconomics', author:'N. Gregory Mankiw', isbn:'978-1319105990', quantity:4, pdfFilePath:'sample.pdf' },
+        { id:7, title:'Digital Economy and Business', author:'Prof. Dara Kim', isbn:'978-9924000003', quantity:7, pdfFilePath:null },
+        { id:8, title:'English for Academic Purposes', author:'John Smith', isbn:'978-0521545525', quantity:10, pdfFilePath:null },
+        { id:9, title:'Strategic Management', author:'Fred R. David', isbn:'978-0134153971', quantity:3, pdfFilePath:'sample.pdf' },
+        { id:10, title:'Database Systems', author:'Ramez Elmasri', isbn:'978-0133970777', quantity:5, pdfFilePath:null },
+        { id:11, title:'Business Law Fundamentals', author:'Henry Cheeseman', isbn:'978-0135219683', quantity:4, pdfFilePath:null },
+        { id:12, title:'Corporate Finance', author:'Brealey Myers Allen', isbn:'978-1260013900', quantity:6, pdfFilePath:'sample.pdf' },
+      ];
+    }
+    updateCounts();
+    applyAll();
+  }
+
+  function showSkeletons() {
+    document.getElementById('booksContainer').innerHTML = Array(8).fill(`
+      <div class="skeleton">
+        <div class="skeleton-cover"></div>
+        <div class="skeleton-body">
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line short"></div>
+        </div>
+      </div>`).join('');
+  }
+
+  function updateCounts() {
+    document.getElementById('cnt_all').textContent = allBooks.length;
+    const cats = { management:0, it:0, law:0, finance:0, economics:0 };
+    allBooks.forEach(b => {
+      const t = (b.title + ' ' + (b.author||'')).toLowerCase();
+      if (t.includes('management') || t.includes('strategic')) cats.management++;
+      if (t.includes('computer') || t.includes('database') || t.includes('digital') || t.includes('system')) cats.it++;
+      if (t.includes('law') || t.includes('legal')) cats.law++;
+      if (t.includes('finance') || t.includes('accounting') || t.includes('corporate')) cats.finance++;
+      if (t.includes('economics') || t.includes('macro') || t.includes('micro')) cats.economics++;
+    });
+    Object.entries(cats).forEach(([k,v]) => {
+      const el = document.getElementById('cnt_' + k);
+      if (el) el.textContent = v;
+    });
+  }
+
+  function applyAll() {
+    let books = [...allBooks];
+    if (currentSearch) {
+      const q = currentSearch.toLowerCase();
+      books = books.filter(b =>
+        (b.title||'').toLowerCase().includes(q) ||
+        (b.author||'').toLowerCase().includes(q) ||
+        (b.isbn||'').toLowerCase().includes(q)
+      );
+    }
+    if (activeCategory !== 'all') {
+      books = books.filter(b => {
+        const t = ((b.title||'') + ' ' + (b.author||'')).toLowerCase();
+        const cat = activeCategory.toLowerCase();
+        if (cat === 'management') return t.includes('management') || t.includes('strategic');
+        if (cat === 'it') return t.includes('computer') || t.includes('database') || t.includes('digital') || t.includes('system');
+        if (cat === 'law') return t.includes('law') || t.includes('legal');
+        if (cat === 'finance') return t.includes('finance') || t.includes('accounting') || t.includes('corporate');
+        if (cat === 'economics') return t.includes('economics') || t.includes('macro');
+        return true;
+      });
+    }
+    if (onlyAvailable) books = books.filter(b => b.quantity > 0);
+    filtered = books;
+    currentPage = 1;
+    renderPage();
+  }
+
+  function renderPage() {
+    const total = filtered.length;
+    document.getElementById('resultCount').textContent = total;
+    const label = currentSearch ? ` សម្រាប់ "<strong>${currentSearch}</strong>"` : '';
+    document.getElementById('searchLabel').innerHTML = label;
+
+    const start = (currentPage - 1) * PAGE_SIZE;
+    const page = filtered.slice(start, start + PAGE_SIZE);
+    const c = document.getElementById('booksContainer');
+
+    if (page.length === 0) {
+      c.innerHTML = `<div class="empty-state">
+        <div class="icon">📭</div>
+        <h3>រកមិនឃើញសៀវភៅ</h3>
+        <p>សូមព្យាយាមស្វែងរកដោយពាក្យផ្សេង</p>
+      </div>`;
+      document.getElementById('pagination').innerHTML = '';
+      return;
+    }
+
+    c.innerHTML = page.map((b, i) => {
+      const colorIdx = (b.id || i) % COLORS.length;
+      const emoji = EMOJIS[(b.id || i) % EMOJIS.length];
+      const isNew = b.id > allBooks.length - 3;
+      const qty = b.quantity ?? 0;
+      const hasPdf = b.pdfFilePath != null && b.pdfFilePath !== '';
+
+      return `
+        <div class="book-card ${hasPdf ? 'has-pdf' : ''}" onclick="openModal(${JSON.stringify(JSON.stringify(b))})">
+          <div class="book-cover ${COLORS[colorIdx]}">
+            <span>${emoji}</span>
+            ${isNew ? '<span class="book-badge-new">New</span>' : ''}
+            <span class="book-qty">📦 ${qty}</span>
+            ${hasPdf ? '<span class="book-pdf-badge">📄 PDF</span>' : ''}
+            ${hasPdf ? '<div class="pdf-hover-overlay">📖 អានPDF</div>' : ''}
+          </div>
+          <div class="book-info">
+            <h4>${b.title || 'Untitled'}</h4>
+            <div class="book-author">✍️ ${b.author || 'Unknown'}</div>
+            <div class="book-footer">
+              <span class="book-tag">📚 Library</span>
+              <span class="book-isbn">${b.isbn ? b.isbn.slice(-8) : '—'}</span>
+            </div>
+            <button class="btn-borrow" onclick="event.stopPropagation(); borrowBook(${b.id}, '${(b.title||'').replace(/'/g,"\\'")}')">
+              ${qty > 0 ? '📖 ខ្ចី' : '⛔ អស់ស្ត៉ក'}
+            </button>
+          </div>
+        </div>`;
+    }).join('');
+
+    renderPagination(total);
+  }
+
+  function renderPagination(total) {
+    const pages = Math.ceil(total / PAGE_SIZE);
+    if (pages <= 1) { document.getElementById('pagination').innerHTML = ''; return; }
+    let html = '';
+    if (currentPage > 1) html += `<button class="page-btn wide" onclick="goPage(${currentPage-1})">‹ មុន</button>`;
+    for (let i = 1; i <= pages; i++) {
+      if (i === 1 || i === pages || (i >= currentPage - 1 && i <= currentPage + 1))
+        html += `<button class="page-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
+      else if (i === currentPage - 2 || i === currentPage + 2)
+        html += `<button class="page-btn" disabled>…</button>`;
+    }
+    if (currentPage < pages) html += `<button class="page-btn wide" onclick="goPage(${currentPage+1})">បន្ទាប់ ›</button>`;
+    document.getElementById('pagination').innerHTML = html;
+  }
+
+  function goPage(p) { currentPage = p; renderPage(); window.scrollTo({ top: 200, behavior: 'smooth' }); }
+
+  // ─────────────────────────────────────────────
+  // MODAL — open with PDF section populated by JS
+  // ─────────────────────────────────────────────
+  function openModal(jsonStr) {
+    const b = JSON.parse(jsonStr);
+    selectedBookId = b.id;
+
+    const idx = (b.id || 0) % COLORS.length;
+    const emoji = EMOJIS[(b.id || 0) % EMOJIS.length];
+
+    document.getElementById('modalCover').className = `modal-cover ${COLORS[idx]}`;
+    document.getElementById('modalCover').innerHTML = `<span style="font-size:50px">${emoji}</span>`;
+    document.getElementById('modalTitle').textContent = b.title || 'Untitled';
+    document.getElementById('modalAuthor').textContent = '✍️ ' + (b.author || 'Unknown');
+    document.getElementById('modalIsbn').textContent = b.isbn || '—';
+    document.getElementById('modalQty').textContent = b.quantity + ' ក្បាល';
+    document.getElementById('modalStatus').textContent = b.quantity > 0 ? '✅ មាន' : '❌ អស់';
+    document.getElementById('modalId').textContent = '#' + b.id;
+
+    const borrowBtn = document.getElementById('modalBorrowBtn');
+    borrowBtn.onclick = () => { closeModal(); borrowBook(b.id, b.title); };
+    borrowBtn.textContent = b.quantity > 0 ? '📖 ខ្ចីសៀវភៅ' : '⛔ អស់ស្ត៉ក';
+    borrowBtn.disabled = b.quantity <= 0;
+
+    // ✅ Populate PDF section using JavaScript — no Thymeleaf needed
+    const hasPdf = b.pdfFilePath != null && b.pdfFilePath !== '';
+    updatePdfUI(hasPdf, b.id);
+
+    // Reset file input and message
+    document.getElementById('pdfFileInput').value = '';
+    hidePdfMessage();
+
+    document.getElementById('modalOverlay').classList.add('show');
+  }
+
+  // ✅ Update PDF UI state (called on open and after upload/delete)
+  function updatePdfUI(hasPdf, bookId) {
+    const statusHas   = document.getElementById('pdfStatusHas');
+    const statusNone  = document.getElementById('pdfStatusNone');
+    const viewBtn     = document.getElementById('btnViewPdf');
+    const deleteBtn   = document.getElementById('btnDeletePdf');
+    const adminCtrl   = document.getElementById('pdfAdminControls');
+
+    if (hasPdf) {
+      statusHas.style.display  = 'flex';
+      statusNone.style.display = 'none';
+      viewBtn.style.display    = 'flex';
+      viewBtn.href             = `/books/${bookId}/view-pdf`;
+      if (deleteBtn) deleteBtn.style.display = 'inline-block';
+    } else {
+      statusHas.style.display  = 'none';
+      statusNone.style.display = 'flex';
+      viewBtn.style.display    = 'none';
+      if (deleteBtn) deleteBtn.style.display = 'none';
+    }
+
+    // Show upload controls to admin only
+    adminCtrl.style.display = isAdmin ? 'block' : 'none';
+  }
+
+  function closeModal(e) {
+    if (!e || e.target === document.getElementById('modalOverlay'))
+      document.getElementById('modalOverlay').classList.remove('show');
+  }
+
+  // ─────────────────────────────────────────────
+  // ✅ UPLOAD PDF — pure fetch(), no form submit
+  // ─────────────────────────────────────────────
+  async function uploadPdf() {
+    if (!selectedBookId) { showPdfMessage('⚠️ No book selected.', 'error'); return; }
+
+    const fileInput = document.getElementById('pdfFileInput');
+    if (!fileInput.files.length) { showPdfMessage('⚠️ សូមជ្រើសសៀវភៅ PDF ជាមុន', 'error'); return; }
+
+    const file = fileInput.files[0];
+    if (!file.name.toLowerCase().endsWith('.pdf')) {
+      showPdfMessage('⚠️ តែ​ PDF files ប៉ុណ្ណោះ', 'error');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('pdfFile', file);   // must match @RequestParam("pdfFile") in controller
+
+    showPdfMessage('⏳ កំពុង Upload...', 'info');
+
+    try {
+      const res = await fetch(`/books/${selectedBookId}/upload-pdf`, {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+        body: formData
+        // ⚠️ Do NOT set Content-Type header — browser sets it automatically with boundary
+      });
+
+      if (res.ok || res.redirected) {
+        showPdfMessage('✅ Upload PDF បានជោគជ័យ!', 'success');
+        fileInput.value = '';
+        updatePdfUI(true, selectedBookId);
+
+        // Also update the book in allBooks array so card shows PDF badge
+        const book = allBooks.find(b => b.id === selectedBookId);
+        if (book) book.pdfFilePath = 'uploaded.pdf';
+        renderPage();
+      } else {
+        const txt = await res.text();
+        showPdfMessage('❌ Upload បរាជ័យ — ' + (res.status), 'error');
+      }
+    } catch (e) {
+      showPdfMessage('❌ មិនអាចភ្ជាប់ Server', 'error');
+    }
+  }
+
+  // ─────────────────────────────────────────────
+  // ✅ DELETE PDF — pure fetch()
+  // ─────────────────────────────────────────────
+  async function deletePdf() {
+    if (!selectedBookId) return;
+    if (!confirm('តើអ្នកប្រាកដថាចង់លុប PDF នេះ?')) return;
+
+    showPdfMessage('⏳ កំពុងលុប...', 'info');
+
+    try {
+      const res = await fetch(`/books/${selectedBookId}/delete-pdf`, {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+      });
+
+      if (res.ok || res.redirected) {
+        showPdfMessage('🗑 PDF បានលុបដោយជោគជ័យ', 'success');
+        updatePdfUI(false, selectedBookId);
+
+        // Update allBooks array so card loses PDF badge
+        const book = allBooks.find(b => b.id === selectedBookId);
+        if (book) book.pdfFilePath = null;
+        renderPage();
+      } else {
+        showPdfMessage('❌ លុបបរាជ័យ — ' + res.status, 'error');
+      }
+    } catch (e) {
+      showPdfMessage('❌ មិនអាចភ្ជាប់ Server', 'error');
+    }
+  }
+
+  function showPdfMessage(msg, type) {
+    const el = document.getElementById('pdfMessage');
+    el.textContent = msg;
+    el.className = 'pdf-message ' + type;
+  }
+  function hidePdfMessage() {
+    const el = document.getElementById('pdfMessage');
+    el.className = 'pdf-message';
+    el.textContent = '';
+  }
+
+  // ─────────────────────────────────────────────
+  // BORROW
+  // ─────────────────────────────────────────────
+  function borrowBook(id, title) {
+    const token = localStorage.getItem('token');
+    if (!token) { showToast('🔐 សូមចូលគណនីជាមុនសិន'); setTimeout(() => window.location.href='login.html', 1200); return; }
+    showToast(`✅ បានស្នើខ្ចី "${title}" ដោយជោគជ័យ!`);
+  }
+
+  // ─────────────────────────────────────────────
+  // ADD BOOK (admin)
+  // ─────────────────────────────────────────────
+  async function addBook() {
+    const title    = document.getElementById('newTitle').value.trim();
+    const author   = document.getElementById('newAuthor').value.trim();
+    const isbn     = document.getElementById('newIsbn').value.trim();
+    const quantity = parseInt(document.getElementById('newQty').value) || 1;
+
+    if (!title || !author) { showToast('⚠️ សូមបញ្ចូលចំណងជើង និងអ្នកនិពន្ធ'); return; }
+
+    try {
+      const res = await fetch(API, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + localStorage.getItem('token')
+        },
+        body: JSON.stringify({ title, author, isbn, quantity })
+      });
+
+      if (res.ok) {
+        showToast('✅ បានបន្ថែមសៀវភៅដោយជោគជ័យ!');
+        toggleAddForm();
+        loadBooks();
+        document.getElementById('newTitle').value = '';
+        document.getElementById('newAuthor').value = '';
+        document.getElementById('newIsbn').value = '';
+        document.getElementById('newQty').value = '1';
+      } else {
+        showToast('❌ មានបញ្ហា — សូមព្យាយាមម្តងទៀត');
+      }
+    } catch {
+      showToast('❌ មិនអាចភ្ជាប់ Server');
+    }
+  }
+
+  // ─────────────────────────────────────────────
+  // FILTERS & SORT
+  // ─────────────────────────────────────────────
+  function searchBooks() { currentSearch = document.getElementById('searchInput').value.trim(); applyAll(); }
+  function debounceSearch() { clearTimeout(debounceTimer); debounceTimer = setTimeout(searchBooks, 400); }
+  function quickSearch(q) { document.getElementById('searchInput').value = q; currentSearch = q; applyAll(); }
+
+  function applyFilter(cat, el) {
+    if (cat === 'all') {
+      document.querySelectorAll('[id^="f_"]').forEach(c => { if (c.id !== 'f_all') c.checked = false; });
+      activeCategory = 'all';
+    } else {
+      document.getElementById('f_all').checked = false;
+      activeCategory = el.checked ? cat : 'all';
+    }
+    applyAll();
+  }
+
+  function filterAvailable(el) { onlyAvailable = el.checked; applyAll(); }
+
+  function clearFilters() {
+    document.querySelectorAll('[id^="f_"]').forEach(c => c.checked = false);
+    document.getElementById('f_all').checked = true;
+    activeCategory = 'all'; onlyAvailable = false; currentSearch = '';
+    document.getElementById('searchInput').value = '';
+    applyAll();
+  }
+
+  function sortBooks(by) {
+    if (by === 'title') filtered.sort((a,b) => (a.title||'').localeCompare(b.title||''));
+    else if (by === 'author') filtered.sort((a,b) => (a.author||'').localeCompare(b.author||''));
+    else if (by === 'qty_desc') filtered.sort((a,b) => (b.quantity||0) - (a.quantity||0));
+    else if (by === 'qty_asc') filtered.sort((a,b) => (a.quantity||0) - (b.quantity||0));
+    else filtered = [...allBooks].filter(b => filtered.find(f => f.id === b.id));
+    renderPage();
+  }
+
+  function setView(view, btn) {
+    document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const c = document.getElementById('booksContainer');
+    view === 'list' ? c.classList.add('list-view') : c.classList.remove('list-view');
+  }
+
+  function toggleAddForm() { document.getElementById('addForm').classList.toggle('show'); }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.innerHTML = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  function logout() { localStorage.clear(); window.location.href = 'login.html'; }
+</script>
+</body>
+</html>
