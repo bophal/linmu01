@@ -1,12 +1,12 @@
-FROM maven:3.9-eclipse-temurin-17-alpine AS build
-WORKDIR /app
-COPY pom.xml .
-RUN mvn dependency:go-offline -B
-COPY src ./src
-RUN mvn clean package -DskipTests
-
-FROM eclipse-temurin:17-jre-alpine
-WORKDIR /app
-COPY --from=build /app/target/*.jar app.jar
-EXPOSE 8081
-ENTRYPOINT ["java", "-jar", "app.jar"]
+echo FROM maven:3.9-eclipse-temurin-17-alpine AS build > Dockerfile
+echo WORKDIR /app >> Dockerfile
+echo COPY pom.xml . >> Dockerfile
+echo RUN mvn dependency:go-offline -B >> Dockerfile
+echo COPY src ./src >> Dockerfile
+echo RUN mvn clean package -DskipTests >> Dockerfile
+echo. >> Dockerfile
+echo FROM eclipse-temurin:17-jre-alpine >> Dockerfile
+echo WORKDIR /app >> Dockerfile
+echo COPY --from=build /app/target/*.jar app.jar >> Dockerfile
+echo EXPOSE 8081 >> Dockerfile
+echo ENTRYPOINT ["java", "-jar", "app.jar"] >> Dockerfile
