@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LiNMU — កាតាឡុកសៀវភៅ</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #1a3a5c;
+    --accent: #c8932a;
+    --accent2: #e8b84b;
+    --light: #f5f0e8;
+    --white: #ffffff;
+    --text: #1a1a2e;
+    --muted: #6b7280;
+    --border: #e5e0d5;
+    --hover: #f0ebe0;
+    --success: #059669;
+    --error: #dc2626;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', sans-serif; background: #f7f5f0; color: var(--text); }
+
+  nav {
+    background: var(--white); box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .nav-inner {
+    max-width: 1280px; margin: 0 auto; padding: 0 32px;
+    display: flex; align-items: center; gap: 20px; height: 60px;
+  }
+  .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .logo-icon { width: 36px; height: 36px; background: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+  .logo span { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; color: var(--primary); }
+  .nav-links { display: flex; gap: 2px; flex: 1; }
+  .nav-links a { padding: 8px 14px; color: var(--muted); text-decoration: none; font-size: 13px; font-weight: 500; border-radius: 6px; transition: all 0.2s; }
+  .nav-links a:hover, .nav-links a.active { color: var(--primary); background: var(--light); }
+  .nav-links a.active { color: var(--accent); font-weight: 600; }
+  .nav-right { display: flex; gap: 8px; margin-left: auto; align-items: center; }
+  .btn-nav { padding: 7px 16px; border-radius: 7px; font-size: 12px; font-weight: 600; font-family: inherit; cursor: pointer; text-decoration: none; transition: all 0.2s; border: none; }
+  .btn-nav.primary { background: var(--primary); color: white; }
+  .btn-nav.outline { background: none; border: 1.5px solid var(--border); color: var(--muted); }
+  .btn-nav.outline:hover { border-color: var(--error); color: var(--error); }
+
+  .page-header { background: var(--primary); padding: 0 32px; }
+  .header-inner { max-width: 1280px; margin: 0 auto; display: flex; align-items: center; }
+  .header-title { background: var(--accent); color: white; font-size: 15px; font-weight: 700; padding: 14px 36px 14px 24px; display: flex; align-items: center; gap: 8px; clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 100%, 0 100%); }
+  .header-search { flex: 1; padding: 10px 20px; }
+  .search-wrap { display: flex; max-width: 600px; background: white; border-radius: 6px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+  .search-wrap input { flex: 1; border: none; padding: 10px 16px; font-size: 13px; font-family: inherit; outline: none; }
+  .search-wrap button { background: var(--accent); border: none; padding: 10px 18px; color: white; cursor: pointer; font-size: 16px; }
+
+  .tabs-bar { background: var(--white); border-bottom: 2px solid var(--border); padding: 0 32px; }
+  .tabs-inner { max-width: 1280px; margin: 0 auto; display: flex; overflow-x: auto; }
+  .tab-item { padding: 12px 20px; font-size: 13px; font-weight: 500; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; white-space: nowrap; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
+  .tab-item:hover { color: var(--primary); }
+  .tab-item.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+  .tab-count { background: var(--light); color: var(--muted); font-size: 10px; padding: 1px 6px; border-radius: 10px; }
+  .tab-item.active .tab-count { background: var(--accent); color: white; }
+
+  .main { max-width: 1280px; margin: 0 auto; padding: 24px 32px; display: grid; grid-template-columns: 220px 1fr; gap: 24px; }
+  .sidebar { position: sticky; top: 80px; }
+  .filter-box { background: var(--white); border-radius: 10px; border: 1.5px solid var(--border); overflow: hidden; margin-bottom: 14px; }
+  .filter-head { background: var(--primary); color: white; padding: 10px 16px; font-size: 12px; font-weight: 700; text-transform: uppercase; display: flex; justify-content: space-between; align-items: center; }
+  .filter-head button { background: none; border: none; color: rgba(255,255,255,0.6); font-size: 11px; cursor: pointer; font-family: inherit; }
+  .filter-list { padding: 8px 0; }
+  .filter-item { display: flex; align-items: center; gap: 10px; padding: 8px 16px; cursor: pointer; transition: background 0.15s; }
+  .filter-item:hover { background: var(--hover); }
+  .filter-item input { accent-color: var(--accent); cursor: pointer; }
+  .filter-label { font-size: 13px; color: var(--text); flex: 1; cursor: pointer; }
+
+  .content-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 10px; }
+  .result-info { font-size: 13px; color: var(--muted); }
+  .result-info strong { color: var(--primary); font-size: 15px; }
+  .view-controls { display: flex; align-items: center; gap: 10px; }
+  .sort-select { border: 1.5px solid var(--border); padding: 6px 12px; border-radius: 7px; font-size: 12px; font-family: inherit; background: white; outline: none; cursor: pointer; }
+  .view-btns { display: flex; gap: 3px; }
+  .view-btn { width: 30px; height: 30px; border: 1.5px solid var(--border); border-radius: 6px; background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 13px; transition: all 0.2s; }
+  .view-btn.active { background: var(--primary); border-color: var(--primary); color: white; }
+
+  /* BOOK GRID */
+  #catalog { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; }
+  #catalog.list-view { grid-template-columns: 1fr; }
+
+  .book-card { background: white; border-radius: 8px; border: 1.5px solid var(--border); overflow: hidden; cursor: pointer; transition: all 0.22s; animation: fadeUp 0.4s ease both; }
+  .book-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); border-color: var(--accent); }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+
+  .book-cover-wrap { position: relative; overflow: hidden; background: var(--light); aspect-ratio: 3/4; }
+  .book-cover-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; display: block; }
+  .book-card:hover .book-cover-img { transform: scale(1.05); }
+  .book-placeholder { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 32px; gap: 6px; }
+  .book-placeholder .pt { font-size: 9px; color: rgba(255,255,255,0.65); text-align: center; padding: 0 6px; line-height: 1.3; }
+  .c0{background:linear-gradient(160deg,#1a3a5c,#2a6aad)}.c1{background:linear-gradient(160deg,#7c3aed,#a855f7)}.c2{background:linear-gradient(160deg,#059669,#10b981)}.c3{background:linear-gradient(160deg,#dc2626,#f87171)}.c4{background:linear-gradient(160deg,#d97706,#fbbf24)}.c5{background:linear-gradient(160deg,#0891b2,#22d3ee)}.c6{background:linear-gradient(160deg,#7c2d12,#ea580c)}.c7{background:linear-gradient(160deg,#1e3a5f,#3b6cb7)}
+
+  .book-badge { position: absolute; top: 8px; left: 8px; background: var(--accent); color: white; font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 3px; }
+  .book-views { position: absolute; bottom: 8px; left: 8px; background: rgba(0,0,0,0.5); color: white; font-size: 10px; padding: 2px 7px; border-radius: 10px; }
+  .book-info { padding: 10px 10px 12px; }
+  .book-title { font-size: 12px; font-weight: 600; color: var(--primary); line-height: 1.4; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .book-author { font-size: 11px; color: var(--muted); margin-bottom: 3px; }
+  .book-qty { font-size: 10px; color: var(--accent); font-weight: 600; }
+
+  #catalog.list-view .book-card { display: flex; }
+  #catalog.list-view .book-cover-wrap { width: 80px; height: 110px; flex-shrink: 0; aspect-ratio: unset; border-radius: 0; }
+  #catalog.list-view .book-info { flex: 1; padding: 12px 16px; display: flex; align-items: center; gap: 24px; }
+  #catalog.list-view .book-title { font-size: 14px; min-width: 200px; -webkit-line-clamp: 1; }
+
+  .skeleton { background: white; border-radius: 8px; border: 1.5px solid var(--border); overflow: hidden; }
+  .skel-c { aspect-ratio: 3/4; background: linear-gradient(90deg,#f0ebe0 25%,#e8e3d8 50%,#f0ebe0 75%); background-size: 200%; animation: shimmer 1.4s infinite; }
+  .skel-b { padding: 10px; }
+  .skel-l { height: 10px; border-radius: 4px; margin-bottom: 6px; background: linear-gradient(90deg,#f0ebe0 25%,#e8e3d8 50%,#f0ebe0 75%); background-size: 200%; animation: shimmer 1.4s infinite; }
+  .skel-l.s { width: 60%; }
+  @keyframes shimmer { to { background-position: -200% 0; } }
+
+  .empty { grid-column: 1/-1; text-align: center; padding: 60px; }
+  .empty .icon { font-size: 56px; margin-bottom: 14px; }
+
+  .pagination { display: flex; justify-content: center; gap: 5px; margin-top: 28px; flex-wrap: wrap; }
+  .pg-btn { min-width: 34px; height: 34px; padding: 0 10px; border: 1.5px solid var(--border); border-radius: 6px; background: white; font-family: inherit; font-size: 12px; font-weight: 500; color: var(--text); cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+  .pg-btn:hover, .pg-btn.active { background: var(--primary); border-color: var(--primary); color: white; }
+  .pg-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* ===== MODAL ===== */
+  .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 1000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
+  .overlay.show { display: flex; }
+  .modal { background: white; border-radius: 16px; padding: 32px; max-width: 560px; width: 94%; position: relative; animation: popIn 0.3s ease; max-height: 90vh; overflow-y: auto; }
+  @keyframes popIn { from{transform:scale(0.92);opacity:0} to{transform:scale(1);opacity:1} }
+  .modal-close { position: absolute; top: 14px; right: 14px; width: 30px; height: 30px; border-radius: 6px; background: var(--light); border: none; cursor: pointer; font-size: 14px; color: var(--muted); }
+  .modal-close:hover { background: var(--border); }
+  .modal-top { display: flex; gap: 20px; margin-bottom: 20px; }
+  .modal-cover-wrap {
+    width: 130px; height: 175px; border-radius: 10px; flex-shrink: 0;
+    overflow: hidden; position: relative; cursor: pointer;
+    border: 2px solid var(--border);
+  }
+  .modal-cover-wrap img, .modal-cover-placeholder {
+    width: 100%; height: 100%; object-fit: cover;
+    display: flex; align-items: center; justify-content: center; font-size: 48px;
+  }
+  /* Upload overlay on cover */
+  .cover-upload-overlay {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    color: white; font-size: 11px; font-weight: 600;
+    opacity: 0; transition: opacity 0.2s;
+    gap: 4px;
+  }
+  .modal-cover-wrap:hover .cover-upload-overlay { opacity: 1; }
+  .cover-upload-overlay span { font-size: 22px; }
+  #coverFileInput { display: none; }
+
+  .modal-meta { flex: 1; }
+  .modal-meta h2 { font-size: 17px; font-weight: 700; color: var(--primary); margin-bottom: 6px; line-height: 1.4; }
+  .modal-meta .auth { font-size: 13px; color: var(--muted); margin-bottom: 10px; }
+  .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .modal-item { background: var(--light); border-radius: 7px; padding: 8px 12px; }
+  .modal-item .lbl { font-size: 10px; color: var(--muted); margin-bottom: 2px; }
+  .modal-item .val { font-size: 13px; font-weight: 600; color: var(--primary); }
+  .modal-actions { display: flex; gap: 10px; margin-top: 16px; }
+  .btn-borrow { flex: 1; padding: 11px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; transition: background 0.2s; }
+  .btn-borrow:hover { background: var(--accent); }
+  .btn-borrow:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-share { padding: 11px 16px; background: none; border: 1.5px solid var(--border); border-radius: 8px; font-size: 13px; font-family: inherit; cursor: pointer; color: var(--muted); transition: all 0.2s; }
+  .btn-share:hover { border-color: var(--primary); color: var(--primary); }
+
+  /* Upload progress */
+  .upload-progress {
+    margin-top: 10px; display: none;
+  }
+  .progress-bar {
+    height: 4px; background: var(--border); border-radius: 2px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; background: var(--accent); border-radius: 2px;
+    width: 0%; transition: width 0.3s;
+  }
+  .upload-status { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+  /* ===== ADD BOOK MODAL ===== */
+  .add-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 1000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
+  .add-overlay.show { display: flex; }
+  .add-modal { background: white; border-radius: 16px; padding: 32px; width: 560px; max-width: 95%; animation: popIn 0.3s ease; max-height: 90vh; overflow-y: auto; }
+  .add-modal h3 { font-size: 18px; font-weight: 700; color: var(--primary); margin-bottom: 20px; }
+
+  /* Cover drop zone */
+  .cover-dropzone {
+    border: 2px dashed var(--border); border-radius: 10px;
+    padding: 20px; text-align: center; cursor: pointer;
+    transition: all 0.2s; margin-bottom: 16px; position: relative;
+    background: var(--light);
+  }
+  .cover-dropzone:hover, .cover-dropzone.drag-over { border-color: var(--accent); background: #fdf8f0; }
+  .cover-dropzone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  .dropzone-preview { display: none; }
+  .dropzone-preview img { max-height: 160px; border-radius: 8px; margin: 0 auto; display: block; }
+  .dropzone-placeholder .dz-icon { font-size: 32px; margin-bottom: 8px; }
+  .dropzone-placeholder p { font-size: 13px; color: var(--muted); }
+  .dropzone-placeholder small { font-size: 11px; color: var(--muted); opacity: 0.7; }
+  .dropzone-placeholder .browse { color: var(--accent); font-weight: 600; }
+
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .field-group { margin-bottom: 14px; }
+  .field-group label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 5px; }
+  .field-group input, .field-group select {
+    width: 100%; padding: 10px 12px; border: 1.5px solid var(--border);
+    border-radius: 8px; font-size: 13px; font-family: inherit;
+    color: var(--text); outline: none; background: var(--light); transition: border-color 0.2s;
+  }
+  .field-group input:focus, .field-group select:focus { border-color: var(--primary); background: white; }
+  .add-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+  .btn-cancel { padding: 10px 20px; background: none; border: 1.5px solid var(--border); border-radius: 8px; font-size: 13px; font-family: inherit; cursor: pointer; color: var(--muted); }
+  .btn-add-save { padding: 10px 24px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; gap: 6px; }
+  .btn-add-save:hover { background: #0f2640; }
+  .btn-add-save:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  /* FAB */
+  .fab { position: fixed; bottom: 28px; left: 28px; background: var(--accent); color: white; border: none; border-radius: 50px; padding: 12px 20px; font-size: 13px; font-weight: 700; font-family: inherit; cursor: pointer; box-shadow: 0 4px 16px rgba(200,147,42,0.4); transition: all 0.2s; display: none; align-items: center; gap: 8px; z-index: 100; }
+  .fab:hover { background: #b8821f; transform: translateY(-2px); }
+  .fab.show { display: flex; }
+
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--primary); color: white; padding: 12px 18px; border-radius: 10px; font-size: 13px; font-weight: 500; box-shadow: 0 6px 20px rgba(0,0,0,0.2); z-index: 9999; transform: translateY(60px); opacity: 0; transition: all 0.3s; max-width: 320px; }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.success { background: var(--success); }
+  .toast.error { background: var(--error); }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="logo">
+      <div class="logo-icon">📚</div>
+      <span>LiNMU</span>
+    </a>
+    <div class="nav-links">
+      <a href="index.html">ទំព័រដើម</a>
+      <a href="catalog.html" class="active">📖 កាតាឡុក</a>
+      <a href="books.html">ស្វែងរក</a>
+      <a href="#">និក្ខេបបទ</a>
+    </div>
+    <div class="nav-right">
+      <span style="font-size:13px;color:var(--muted)" id="userName">Guest</span>
+      <a href="login.html" class="btn-nav primary" id="loginBtn">🔐 ចូលគណនី</a>
+      <button class="btn-nav outline" id="logoutBtn" onclick="logout()" style="display:none">ចាកចេញ</button>
+    </div>
+  </div>
+</nav>
+
+<div class="page-header">
+  <div class="header-inner">
+    <div class="header-title">📚 សៀវភៅក្នុងបណ្ណាល័យ</div>
+    <div class="header-search">
+      <div class="search-wrap">
+        <input type="text" id="searchInput" placeholder="ស្វែងរកចំណងជើង, អ្នកនិពន្ធ, ISBN..." oninput="debounce()" onkeydown="if(event.key==='Enter')doSearch()">
+        <button onclick="doSearch()">🔍</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="tabs-bar">
+  <div class="tabs-inner">
+    <a class="tab-item active" onclick="setTab('all',this)">ទាំងអស់ <span class="tab-count" id="tc_all">0</span></a>
+    <a class="tab-item" onclick="setTab('management',this)">Management <span class="tab-count" id="tc_management">0</span></a>
+    <a class="tab-item" onclick="setTab('it',this)">IT / Computer <span class="tab-count" id="tc_it">0</span></a>
+    <a class="tab-item" onclick="setTab('law',this)">Law <span class="tab-count" id="tc_law">0</span></a>
+    <a class="tab-item" onclick="setTab('finance',this)">Finance <span class="tab-count" id="tc_finance">0</span></a>
+    <a class="tab-item" onclick="setTab('economics',this)">Economics <span class="tab-count" id="tc_economics">0</span></a>
+    <a class="tab-item" onclick="setTab('tourism',this)">Tourism <span class="tab-count" id="tc_tourism">0</span></a>
+  </div>
+</div>
+
+<div class="main">
+  <aside class="sidebar">
+    <div class="filter-box">
+      <div class="filter-head">🔽 តម្រង <button onclick="resetFilters()">លុបចោល</button></div>
+      <div class="filter-list">
+        <div class="filter-item"><input type="checkbox" id="f_available" onchange="applyFilters()"><label class="filter-label" for="f_available">មានស្ត៊ក</label></div>
+        <div class="filter-item"><input type="checkbox" id="f_cover" onchange="applyFilters()"><label class="filter-label" for="f_cover">មានរូបភាព</label></div>
+      </div>
+    </div>
+    <div class="filter-box">
+      <div class="filter-head">📊 ស្ថានភាព</div>
+      <div class="filter-list">
+        <div class="filter-item"><input type="radio" name="qty" id="qa" value="all" checked onchange="applyFilters()"><label class="filter-label" for="qa">ទាំងអស់</label></div>
+        <div class="filter-item"><input type="radio" name="qty" id="qv" value="available" onchange="applyFilters()"><label class="filter-label" for="qv">មានស្ត៊ក</label></div>
+        <div class="filter-item"><input type="radio" name="qty" id="qo" value="out" onchange="applyFilters()"><label class="filter-label" for="qo">អស់ស្ត៊ក</label></div>
+      </div>
+    </div>
+  </aside>
+
+  <div>
+    <div class="content-header">
+      <div class="result-info">សៀវភៅ <strong id="resultCount">0</strong> ក្បាល <span id="searchLabel" style="color:var(--accent)"></span></div>
+      <div class="view-controls">
+        <select class="sort-select" onchange="sortBy(this.value)">
+          <option value="default">លំនាំដើម</option>
+          <option value="title">ចំណងជើង A-Z</option>
+          <option value="views">ចូលមើលច្រើន</option>
+          <option value="qty_desc">ចំនួន ↓</option>
+        </select>
+        <div class="view-btns">
+          <button class="view-btn active" onclick="setView('grid',this)">⊞</button>
+          <button class="view-btn" onclick="setView('list',this)">☰</button>
+        </div>
+      </div>
+    </div>
+    <div id="catalog"></div>
+    <div class="pagination" id="pagination"></div>
+  </div>
+</div>
+
+<!-- BOOK DETAIL MODAL -->
+<div class="overlay" id="overlay" onclick="closeOverlay(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeOverlay()">✕</button>
+    <div class="modal-top">
+
+      <!-- Cover image — click to upload (admin only) -->
+      <div class="modal-cover-wrap" id="modalCoverWrap" onclick="triggerCoverUpload()">
+        <div id="modalCoverContent"></div>
+        <div class="cover-upload-overlay" id="coverUploadOverlay" style="display:none">
+          <span>📷</span>
+          ប្ដូររូបភាព
+        </div>
+        <input type="file" id="coverFileInput" accept="image/*" onchange="uploadCover(this)">
+      </div>
+
+      <div class="modal-meta">
+        <h2 id="mTitle"></h2>
+        <div class="auth" id="mAuthor"></div>
+        <div class="modal-grid">
+          <div class="modal-item"><div class="lbl">ISBN</div><div class="val" id="mIsbn">—</div></div>
+          <div class="modal-item"><div class="lbl">ចំនួននៅ</div><div class="val" id="mQty"></div></div>
+          <div class="modal-item"><div class="lbl">ស្ថានភាព</div><div class="val" id="mStatus"></div></div>
+          <div class="modal-item"><div class="lbl">ចូលមើល</div><div class="val" id="mViews"></div></div>
+        </div>
+        <!-- Upload progress -->
+        <div class="upload-progress" id="uploadProgress">
+          <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+          <div class="upload-status" id="uploadStatus">កំពុងបញ្ចូលរូបភាព...</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-borrow" id="mBorrow">📖 ខ្ចីសៀវភៅ</button>
+      <button class="btn-share" onclick="shareBook()">🔗 ចែករំលែក</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD BOOK MODAL -->
+<div class="add-overlay" id="addOverlay" onclick="closeAdd(event)">
+  <div class="add-modal">
+    <h3>➕ បន្ថែមសៀវភៅថ្មី</h3>
+
+    <!-- Cover drop zone -->
+    <div class="cover-dropzone" id="dropzone"
+         ondragover="event.preventDefault();this.classList.add('drag-over')"
+         ondragleave="this.classList.remove('drag-over')"
+         ondrop="handleDrop(event)">
+      <input type="file" id="newCoverInput" accept="image/*" onchange="previewNewCover(this)">
+      <div class="dropzone-placeholder" id="dzPlaceholder">
+        <div class="dz-icon">🖼️</div>
+        <p>ទាញឬ <span class="browse">ជ្រើសរូបភាព</span> គម្របសៀវភៅ</p>
+        <small>JPG, PNG, WEBP — អតិបរមា 5MB</small>
+      </div>
+      <div class="dropzone-preview" id="dzPreview">
+        <img id="dzPreviewImg" src="" alt="preview">
+        <p style="margin-top:8px;font-size:12px;color:var(--success)">✅ រូបភាពត្រៀមហើយ</p>
+        <button onclick="clearPreview(event)" style="margin-top:6px;font-size:11px;color:var(--error);background:none;border:none;cursor:pointer;">✕ លុប</button>
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field-group"><label>ចំណងជើង *</label><input type="text" id="aTitle" placeholder="ឈ្មោះសៀវភៅ"></div>
+      <div class="field-group"><label>អ្នកនិពន្ធ *</label><input type="text" id="aAuthor" placeholder="ឈ្មោះអ្នកនិពន្ធ"></div>
+    </div>
+    <div class="field-row">
+      <div class="field-group"><label>ISBN</label><input type="text" id="aIsbn" placeholder="978-..."></div>
+      <div class="field-group"><label>ចំនួន</label><input type="number" id="aQty" value="1" min="1"></div>
+    </div>
+
+    <div class="add-actions">
+      <button class="btn-cancel" onclick="closeAdd()">បោះបង់</button>
+      <button class="btn-add-save" id="saveBtn" onclick="saveBook()">
+        <span>💾</span> រក្សាទុក
+      </button>
+    </div>
+  </div>
+</div>
+
+<button class="fab" id="fab" onclick="document.getElementById('addOverlay').classList.add('show')">
+  ➕ បន្ថែមសៀវភៅ
+</button>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const API = '/api/books';
+  const UPLOAD_API = '/api/upload/cover';
+  const EMOJIS = ['📘','📗','📕','📙','📒','📓','📔','📑'];
+  const COVERS = ['c0','c1','c2','c3','c4','c5','c6','c7'];
+  const PAGE_SIZE = 12;
+
+  let allBooks = [], filtered = [];
+  let currentPage = 1, activeTab = 'all', searchQuery = '';
+  let debounceTimer, selectedBookId = null;
+  let isAdmin = false;
+  let newCoverFile = null;
+  let tempCoverUrl = null;
+
+  window.onload = () => {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const token = localStorage.getItem('token');
+    if (user.name) document.getElementById('userName').textContent = user.name;
+    if (token) {
+      document.getElementById('loginBtn').style.display = 'none';
+      document.getElementById('logoutBtn').style.display = 'block';
+    }
+    isAdmin = user.role === 'ADMIN';
+    if (isAdmin) {
+      document.getElementById('fab').classList.add('show');
+      document.getElementById('coverUploadOverlay').style.display = 'flex';
+    }
+    loadBooks();
+  };
+
+  async function loadBooks() {
+    showSkeletons();
+    try {
+      const res = await fetch(API);
+      if (!res.ok) throw new Error();
+      allBooks = await res.json();
+      allBooks = allBooks.map(b => ({ ...b, views: Math.floor(Math.random()*500)+50 }));
+    } catch {
+      allBooks = getDemoBooks();
+    }
+    updateTabCounts();
+    applyFilters();
+  }
+
+  function getDemoBooks() {
+    return [
+      {id:1,title:'យាតកម្ពុជាព្រាយខ្មែរ',author:'ហ៊ីង ពិន',isbn:'978-9924001001',quantity:5,views:552,coverUrl:null},
+      {id:2,title:'វីរបុរសកម្ពូជសង្គ្រោះ',author:'ពៅ សាខូ',isbn:'978-9924001002',quantity:3,views:498,coverUrl:null},
+      {id:3,title:'Principles of Management',author:'Robert L. Katz',isbn:'978-0136107590',quantity:8,views:312,coverUrl:null},
+      {id:4,title:'Introduction to Computer Science',author:'John J. Donovan',isbn:'978-0070175600',quantity:5,views:287,coverUrl:null},
+      {id:5,title:'Financial Accounting',author:'Warren Reeve Duchac',isbn:'978-1305088436',quantity:3,views:198,coverUrl:null},
+      {id:6,title:'Cambodia Legal System',author:'Dr. Chan Sopheak',isbn:'978-9924000001',quantity:2,views:445,coverUrl:null},
+      {id:7,title:'Tourism Management SEA',author:'Lim Sokha',isbn:'978-9924000002',quantity:9,views:167,coverUrl:null},
+      {id:8,title:'Macroeconomics 8th Ed',author:'N. Gregory Mankiw',isbn:'978-1319105990',quantity:4,views:223,coverUrl:null},
+      {id:9,title:'Digital Economy',author:'Prof. Dara Kim',isbn:'978-9924000003',quantity:6,views:334,coverUrl:null},
+      {id:10,title:'English for Academic Purposes',author:'John Smith',isbn:'978-0521545525',quantity:10,views:178,coverUrl:null},
+      {id:11,title:'Strategic Management',author:'Fred R. David',isbn:'978-0134153971',quantity:3,views:256,coverUrl:null},
+      {id:12,title:'Database Systems',author:'Ramez Elmasri',isbn:'978-0133970777',quantity:5,views:301,coverUrl:null},
+    ];
+  }
+
+  function showSkeletons() {
+    document.getElementById('catalog').innerHTML = Array(12).fill(`
+      <div class="skeleton"><div class="skel-c"></div>
+      <div class="skel-b"><div class="skel-l"></div><div class="skel-l s"></div></div></div>`).join('');
+  }
+
+  function updateTabCounts() {
+    document.getElementById('tc_all').textContent = allBooks.length;
+    const cats = {management:0,it:0,law:0,finance:0,economics:0,tourism:0};
+    allBooks.forEach(b => {
+      const t = ((b.title||'')+(b.author||'')).toLowerCase();
+      if(t.includes('management')||t.includes('strategic'))cats.management++;
+      if(t.includes('computer')||t.includes('database')||t.includes('digital'))cats.it++;
+      if(t.includes('law')||t.includes('legal'))cats.law++;
+      if(t.includes('finance')||t.includes('accounting'))cats.finance++;
+      if(t.includes('economics')||t.includes('macro'))cats.economics++;
+      if(t.includes('tourism'))cats.tourism++;
+    });
+    Object.entries(cats).forEach(([k,v])=>{const e=document.getElementById('tc_'+k);if(e)e.textContent=v;});
+  }
+
+  function applyFilters() {
+    let books = [...allBooks];
+    if(searchQuery){const q=searchQuery.toLowerCase();books=books.filter(b=>(b.title||'').toLowerCase().includes(q)||(b.author||'').toLowerCase().includes(q)||(b.isbn||'').toLowerCase().includes(q));}
+    if(activeTab!=='all'){books=books.filter(b=>{const t=((b.title||'')+(b.author||'')).toLowerCase();if(activeTab==='management')return t.includes('management')||t.includes('strategic');if(activeTab==='it')return t.includes('computer')||t.includes('database')||t.includes('digital');if(activeTab==='law')return t.includes('law')||t.includes('legal');if(activeTab==='finance')return t.includes('finance')||t.includes('accounting');if(activeTab==='economics')return t.includes('economics')||t.includes('macro');if(activeTab==='tourism')return t.includes('tourism');return true;});}
+    const qf=document.querySelector('input[name="qty"]:checked')?.value||'all';
+    if(qf==='available')books=books.filter(b=>(b.quantity||0)>0);
+    if(qf==='out')books=books.filter(b=>(b.quantity||0)===0);
+    if(document.getElementById('f_available').checked)books=books.filter(b=>(b.quantity||0)>0);
+    if(document.getElementById('f_cover').checked)books=books.filter(b=>b.coverUrl);
+    filtered=books; currentPage=1; renderCatalog();
+  }
+
+  function renderCatalog() {
+    document.getElementById('resultCount').textContent = filtered.length;
+    document.getElementById('searchLabel').textContent = searchQuery ? `| "${searchQuery}"` : '';
+    const start=(currentPage-1)*PAGE_SIZE;
+    const page=filtered.slice(start,start+PAGE_SIZE);
+    const c=document.getElementById('catalog');
+    if(!page.length){c.innerHTML=`<div class="empty"><div class="icon">📭</div><h3>រកមិនឃើញ</h3></div>`;document.getElementById('pagination').innerHTML='';return;}
+    c.innerHTML=page.map((b,i)=>{
+      const ci=(b.id||i)%8;
+      const emoji=EMOJIS[(b.id||i)%8];
+      const delay=(i%PAGE_SIZE)*0.04+'s';
+      const coverHtml = b.coverUrl
+        ? `<img src="${b.coverUrl}" class="book-cover-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+        : '';
+      const placeholderStyle = b.coverUrl ? 'display:none' : '';
+      return `<div class="book-card" style="animation-delay:${delay}" onclick="openModal(${b.id})">
+        <div class="book-cover-wrap">
+          ${coverHtml}
+          <div class="book-placeholder ${COVERS[ci]}" style="${placeholderStyle}">
+            <span>${emoji}</span>
+            <span class="pt">${(b.title||'').substring(0,25)}</span>
+          </div>
+          <span class="book-views">👁 ${b.views||0}</span>
+        </div>
+        <div class="book-info">
+          <div class="book-title">${b.title||'Untitled'}</div>
+          <div class="book-author">✍️ ${b.author||'—'}</div>
+          <div class="book-qty">📦 ${b.quantity||0} ក្បាល</div>
+        </div>
+      </div>`;
+    }).join('');
+    renderPagination(filtered.length);
+  }
+
+  function renderPagination(total) {
+    const pages=Math.ceil(total/PAGE_SIZE);
+    if(pages<=1){document.getElementById('pagination').innerHTML='';return;}
+    let h=`<button class="pg-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹</button>`;
+    for(let i=1;i<=pages;i++){if(i===1||i===pages||Math.abs(i-currentPage)<=1)h+=`<button class="pg-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;else if(Math.abs(i-currentPage)===2)h+=`<button class="pg-btn" disabled>…</button>`;}
+    h+=`<button class="pg-btn" onclick="goPage(${currentPage+1})" ${currentPage===Math.ceil(total/PAGE_SIZE)?'disabled':''}>›</button>`;
+    document.getElementById('pagination').innerHTML=h;
+  }
+
+  function goPage(p){const pages=Math.ceil(filtered.length/PAGE_SIZE);if(p<1||p>pages)return;currentPage=p;renderCatalog();window.scrollTo({top:200,behavior:'smooth'});}
+  function setTab(t,el){document.querySelectorAll('.tab-item').forEach(x=>x.classList.remove('active'));el.classList.add('active');activeTab=t;applyFilters();}
+  function doSearch(){searchQuery=document.getElementById('searchInput').value.trim();applyFilters();}
+  function debounce(){clearTimeout(debounceTimer);debounceTimer=setTimeout(doSearch,350);}
+  function sortBy(by){if(by==='title')filtered.sort((a,b)=>(a.title||'').localeCompare(b.title||''));else if(by==='views')filtered.sort((a,b)=>(b.views||0)-(a.views||0));else if(by==='qty_desc')filtered.sort((a,b)=>(b.quantity||0)-(a.quantity||0));renderCatalog();}
+  function setView(v,btn){document.querySelectorAll('.view-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');const c=document.getElementById('catalog');v==='list'?c.classList.add('list-view'):c.classList.remove('list-view');}
+  function resetFilters(){document.getElementById('f_available').checked=false;document.getElementById('f_cover').checked=false;document.querySelector('input[name="qty"]').checked=true;searchQuery='';document.getElementById('searchInput').value='';activeTab='all';document.querySelectorAll('.tab-item').forEach((t,i)=>t.classList.toggle('active',i===0));applyFilters();}
+
+  // ===== MODAL =====
+  function openModal(id) {
+    const b = allBooks.find(x=>x.id===id);
+    if(!b) return;
+    selectedBookId = id;
+    b.views = (b.views||0)+1;
+
+    // Set cover
+    const coverContent = document.getElementById('modalCoverContent');
+    const ci = (b.id||0)%8;
+    if(b.coverUrl) {
+      coverContent.innerHTML = `<img src="${b.coverUrl}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML='<div class=\\"modal-cover-placeholder ${COVERS[ci]}\\">${EMOJIS[ci]}</div>'">`;
+    } else {
+      coverContent.innerHTML = `<div class="modal-cover-placeholder ${COVERS[ci]}" style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:48px">${EMOJIS[ci]}</div>`;
+    }
+
+    document.getElementById('mTitle').textContent = b.title||'Untitled';
+    document.getElementById('mAuthor').textContent = '✍️ '+(b.author||'—');
+    document.getElementById('mIsbn').textContent = b.isbn||'—';
+    document.getElementById('mQty').textContent = (b.quantity||0)+' ក្បាល';
+    document.getElementById('mStatus').textContent = (b.quantity||0)>0?'✅ មាន':'❌ អស់';
+    document.getElementById('mViews').textContent = '👁 '+(b.views||0);
+
+    const btn = document.getElementById('mBorrow');
+    btn.disabled = (b.quantity||0)<=0;
+    btn.textContent = (b.quantity||0)>0?'📖 ខ្ចីសៀវភៅ':'⛔ អស់ស្ត็ក';
+    btn.onclick = ()=>{closeOverlay();borrowBook(id,b.title);};
+
+    // Show upload hint for admin
+    if(isAdmin) document.getElementById('coverUploadOverlay').style.display='flex';
+    document.getElementById('uploadProgress').style.display='none';
+    document.getElementById('overlay').classList.add('show');
+  }
+
+  function triggerCoverUpload() {
+    if(!isAdmin) return;
+    document.getElementById('coverFileInput').click();
+  }
+
+  async function uploadCover(input) {
+    if(!input.files || !input.files[0]) return;
+    const file = input.files[0];
+
+    // Validate
+    if(!file.type.startsWith('image/')) { showToast('⚠️ សូមជ្រើសរូបភាព JPG/PNG/WEBP!','error'); return; }
+    if(file.size > 5*1024*1024) { showToast('⚠️ ទំហំមិនត្រូវលើស 5MB!','error'); return; }
+
+    // Show progress
+    const progress = document.getElementById('uploadProgress');
+    const fill = document.getElementById('progressFill');
+    const status = document.getElementById('uploadStatus');
+    progress.style.display='block';
+    fill.style.width='0%';
+    status.textContent='កំពុងបញ្ចូលរូបភាព...';
+
+    // Animate progress
+    let pct=0;
+    const interval = setInterval(()=>{pct=Math.min(pct+10,85);fill.style.width=pct+'%';},100);
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const res = await fetch(`${UPLOAD_API}/${selectedBookId}`, {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer '+localStorage.getItem('token') },
+        body: formData
+      });
+      clearInterval(interval);
+
+      if(res.ok) {
+        const data = await res.json();
+        fill.style.width='100%';
+        status.textContent='✅ បានបញ្ចូលដោយជោគជ័យ!';
+
+        // Update UI immediately
+        const coverContent = document.getElementById('modalCoverContent');
+        coverContent.innerHTML = `<img src="${data.coverUrl}?t=${Date.now()}" style="width:100%;height:100%;object-fit:cover">`;
+
+        // Update in allBooks array
+        const book = allBooks.find(b=>b.id===selectedBookId);
+        if(book) book.coverUrl = data.coverUrl;
+
+        // Re-render catalog card
+        renderCatalog();
+        showToast('✅ បានប្ដូររូបភាពគម្របដោយជោគជ័យ!','success');
+
+        setTimeout(()=>progress.style.display='none', 2000);
+      } else {
+        const err = await res.json();
+        clearInterval(interval);
+        fill.style.width='100%';
+        fill.style.background='var(--error)';
+        status.textContent='❌ '+(err.message||'Error');
+        showToast('❌ '+(err.message||'Upload failed'),'error');
+      }
+    } catch(e) {
+      clearInterval(interval);
+      // Demo mode — show preview locally
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const coverContent = document.getElementById('modalCoverContent');
+        coverContent.innerHTML = `<img src="${ev.target.result}" style="width:100%;height:100%;object-fit:cover">`;
+        fill.style.width='100%';
+        status.textContent='✅ Preview (Demo mode)';
+        showToast('📷 Demo: រូបភាពបង្ហាញក្នុង Preview (Server មិនទាន់ភ្ជាប់)');
+        setTimeout(()=>progress.style.display='none', 2000);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Reset input
+    input.value='';
+  }
+
+  // ===== ADD NEW BOOK =====
+  function previewNewCover(input) {
+    if(!input.files||!input.files[0]) return;
+    newCoverFile = input.files[0];
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      document.getElementById('dzPreviewImg').src = e.target.result;
+      document.getElementById('dzPlaceholder').style.display='none';
+      document.getElementById('dzPreview').style.display='block';
+    };
+    reader.readAsDataURL(newCoverFile);
+  }
+
+  function handleDrop(e) {
+    e.preventDefault();
+    document.getElementById('dropzone').classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if(file && file.type.startsWith('image/')) {
+      newCoverFile = file;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        document.getElementById('dzPreviewImg').src = ev.target.result;
+        document.getElementById('dzPlaceholder').style.display='none';
+        document.getElementById('dzPreview').style.display='block';
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  function clearPreview(e) {
+    e.stopPropagation();
+    newCoverFile = null;
+    tempCoverUrl = null;
+    document.getElementById('dzPreviewImg').src='';
+    document.getElementById('dzPlaceholder').style.display='block';
+    document.getElementById('dzPreview').style.display='none';
+    document.getElementById('newCoverInput').value='';
+  }
+
+  async function saveBook() {
+    const title = document.getElementById('aTitle').value.trim();
+    const author = document.getElementById('aAuthor').value.trim();
+    const isbn = document.getElementById('aIsbn').value.trim();
+    const quantity = parseInt(document.getElementById('aQty').value)||1;
+
+    if(!title||!author){showToast('⚠️ សូមបញ្ចូលចំណងជើង និងអ្នកនិពន្ធ!','error');return;}
+
+    const btn = document.getElementById('saveBtn');
+    btn.disabled=true;
+    btn.innerHTML='<span>⏳</span> កំពុងរក្សាទុក...';
+
+    try {
+      // Step 1: Upload cover image first (if selected)
+      if(newCoverFile) {
+        const fd = new FormData();
+        fd.append('file', newCoverFile);
+        try {
+          const uploadRes = await fetch('/api/upload/cover', {
+            method:'POST',
+            headers:{'Authorization':'Bearer '+localStorage.getItem('token')},
+            body: fd
+          });
+          if(uploadRes.ok) {
+            const uploadData = await uploadRes.json();
+            tempCoverUrl = uploadData.coverUrl;
+          }
+        } catch(e) {
+          console.log('Upload skipped (demo mode)');
+        }
+      }
+
+      // Step 2: Save book data
+      const res = await fetch(API, {
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+localStorage.getItem('token')},
+        body: JSON.stringify({title,author,isbn,quantity,coverUrl:tempCoverUrl})
+      });
+
+      if(res.ok) {
+        showToast('✅ បានបន្ថែមសៀវភៅដោយជោគជ័យ!','success');
+        closeAdd();
+        clearForm();
+        loadBooks();
+      } else {
+        showToast('❌ មានបញ្ហា! សូមព្យាយាមម្ដងទៀត','error');
+      }
+    } catch {
+      showToast('❌ Demo mode: Server មិនទាន់ភ្ជាប់','error');
+    }
+
+    btn.disabled=false;
+    btn.innerHTML='<span>💾</span> រក្សាទុក';
+  }
+
+  function clearForm() {
+    document.getElementById('aTitle').value='';
+    document.getElementById('aAuthor').value='';
+    document.getElementById('aIsbn').value='';
+    document.getElementById('aQty').value='1';
+    newCoverFile=null; tempCoverUrl=null;
+    document.getElementById('dzPreview').style.display='none';
+    document.getElementById('dzPlaceholder').style.display='block';
+  }
+
+  function closeOverlay(e){if(!e||e.target===document.getElementById('overlay'))document.getElementById('overlay').classList.remove('show');}
+  function closeAdd(e){if(!e||e.target===document.getElementById('addOverlay')){document.getElementById('addOverlay').classList.remove('show');clearForm();}}
+  function borrowBook(id,title){const t=localStorage.getItem('token');if(!t){showToast('🔐 សូមចូលគណនីជាមុន!');setTimeout(()=>window.location.href='login.html',1200);return;}showToast(`✅ បានស្នើខ្ចី "${(title||'').substring(0,20)}..."`);}
+  function shareBook(){if(selectedBookId)navigator.clipboard?.writeText(location.href+'?id='+selectedBookId);showToast('🔗 បានចម្លង Link!');}
+  function logout(){localStorage.clear();window.location.href='login.html';}
+
+  function showToast(msg,type='') {
+    const t=document.getElementById('toast');
+    t.textContent=msg;
+    t.className='toast show'+(type?' '+type:'');
+    clearTimeout(t._timer);
+    t._timer=setTimeout(()=>t.classList.remove('show'),3000);
+  }
+</script>
+</body>
+</html>
